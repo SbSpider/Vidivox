@@ -12,7 +12,7 @@ import javafx.stage.Stage;
 /**
  * A window .
  * 
- * @author rajsh
+ * @author sraj144
  *
  */
 public class Window extends Application {

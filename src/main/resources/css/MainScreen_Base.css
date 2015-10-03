@@ -1,5 +1,4 @@
 .root {
-	//-fx-background-color : #454444;
 	-fx-background-image : url("/images/backgrounds/black_white_lake_lonelyboat.jpg");
 	-fx-background-size : cover;
 }
