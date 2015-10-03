@@ -30,11 +30,9 @@ public class Window extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
-		System.out.println("ASDAS");
 
 		Parent root = null;
 		try {
-			System.out.println("Loading");
 			// Preload the FXML. All FXML must be preloaded.
 			FXMLLoadingUtil.registerFXML(FXMLFilenameConstants.MAIN_SCREEN_FXML);
 

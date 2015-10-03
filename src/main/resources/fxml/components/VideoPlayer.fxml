@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.media.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<fx:root fx:id="root" maxHeight="1000.0" maxWidth="1000.0"
+	minHeight="200.0" minWidth="200.0" prefHeight="500.0" prefWidth="500.0"
+	type="BorderPane" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1">
+	<center>
+		<MediaView fitHeight="200.0" fitWidth="200.0"
+			BorderPane.alignment="CENTER" fx:id="mediaView"  />
+	</center>
+	<top>
+		<Label text="Label" BorderPane.alignment="CENTER" />
+	</top>
+</fx:root>

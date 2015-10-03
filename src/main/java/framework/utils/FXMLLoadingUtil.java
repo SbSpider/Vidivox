@@ -68,7 +68,23 @@ public class FXMLLoadingUtil {
 	private static Parent loadFXML(String fxmlFileName) throws IOException {
 		Parent root = null;
 
-		URL resource = FXMLLoadingUtil.class.getClass().getResource("/fxml/" + fxmlFileName + ".fxml");
+		String url = "/fxml/" + fxmlFileName + ".fxml";
+		root = registerFXML_FQ(url);
+
+		return root;
+	}
+
+	/**
+	 * Uses the fully qualified name to register.
+	 * 
+	 * @param videoPlayerFxmlFq
+	 * @return
+	 * @throws IOException
+	 */
+	public static Parent registerFXML_FQ(String videoPlayerFxmlFq) throws IOException {
+		Parent root = null;
+
+		URL resource = FXMLLoadingUtil.class.getClass().getResource(videoPlayerFxmlFq);
 		root = FXMLLoader.load(resource);
 
 		return root;
