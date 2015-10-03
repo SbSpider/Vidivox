@@ -1,4 +1,4 @@
-package application.gui.screens;
+package application.gui.util;
 
 /**
  * Contains filename constants for FXML files.

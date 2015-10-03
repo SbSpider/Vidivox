@@ -2,19 +2,28 @@ package application.gui;
 
 import java.io.IOException;
 
-import application.gui.screens.FXMLFilenameConstants;
+import application.gui.util.FXMLFilenameConstants;
 import framework.utils.FXMLLoadingUtil;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
+/**
+ * A window .
+ * 
+ * @author rajsh
+ *
+ */
 public class Window extends Application {
 
 	private static Stage primaryStage;
 
+	/**
+	 * Allows for the main stage of the application to be obtained with ease.
+	 * 
+	 * @return the primaryStage.
+	 */
 	public static Stage getPrimaryStage() {
 		return primaryStage;
 	}
@@ -62,7 +71,7 @@ public class Window extends Application {
 		launch(args);
 	}
 
-	public static void setPrimaryStage(Stage primaryStage) {
+	private static void setPrimaryStage(Stage primaryStage) {
 		Window.primaryStage = primaryStage;
 	}
 
