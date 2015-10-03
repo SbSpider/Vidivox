@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class Window extends Application {
 
@@ -20,9 +21,11 @@ public class Window extends Application {
 
 	@Override
 	public void start(Stage primaryStage) {
+		System.out.println("ASDAS");
 
 		Parent root = null;
 		try {
+			System.out.println("Loading");
 			// Preload the FXML. All FXML must be preloaded.
 			FXMLLoadingUtil.registerFXML(FXMLFilenameConstants.MAIN_SCREEN_FXML);
 
@@ -35,12 +38,19 @@ public class Window extends Application {
 			throw e;
 		}
 
+		root = FXMLLoadingUtil.getFXMLRoot(FXMLFilenameConstants.MAIN_SCREEN_FXML);
+
 		System.out.println("Preloaded fxml");
 
 		setPrimaryStage(primaryStage);
 		primaryStage.setTitle("Vidivox");
+		primaryStage.setMaximized(true);
 
-		Scene scene = new Scene(FXMLLoadingUtil.getFXMLRoot(FXMLFilenameConstants.MAIN_SCREEN_FXML));
+		// Look into this for removing the windows borders.
+		// primaryStage.initStyle(StageStyle.DECORATED);
+
+		Scene scene = new Scene(root);
+		scene.getStylesheets().add("/css/MainScreen_Base.css");
 
 		primaryStage.setScene(scene);
 

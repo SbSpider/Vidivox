@@ -1,0 +1,13 @@
+.root {
+	-fx-background-color : #454444;
+	-fx-border-color : #454444;
+}
+
+#menuBar    {
+	-fx-background-color : #BFB8B3;
+	-fx-font-weight : bold;
+}
+
+.menu-item .label {
+	-fx-background-color : white;
+} 
