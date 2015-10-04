@@ -218,16 +218,19 @@ public class VideoPlayer extends BorderPane {
 
 		// Register the button event handlers.
 		playPauseButton.setOnAction(event -> {
+			stopTimeline();
+
 			if (playPauseButton.getText().equals(">")) {
-				playPauseButton.setText("||");
-				mediaView.getMediaPlayer().pause();
+				pauseVideo();
 			} else if (playPauseButton.getText().equals("||")) {
-				playPauseButton.setText(">");
-				mediaView.getMediaPlayer().play();
+				playVideo();
 			}
 		});
 
 		stepForwardButton.setOnAction(event -> {
+			stopTimeline();
+			pauseVideo();
+
 			MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
 			Duration currentTime = mediaPlayer.getCurrentTime();
 
@@ -238,6 +241,9 @@ public class VideoPlayer extends BorderPane {
 		});
 
 		stepBackwardButton.setOnAction(event -> {
+			stopTimeline();
+			pauseVideo();
+
 			MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
 			Duration currentTime = mediaPlayer.getCurrentTime();
 
@@ -248,6 +254,9 @@ public class VideoPlayer extends BorderPane {
 		});
 
 		fastForwardButton.setOnAction(event -> {
+
+			pauseVideo();
+
 			if (seekRate < MIN_SEEK_RATE) {
 				seekRate = MIN_SEEK_RATE;
 			} else {
@@ -260,6 +269,7 @@ public class VideoPlayer extends BorderPane {
 		});
 
 		reverseVideoButton.setOnAction(event -> {
+			pauseVideo();
 
 			if (seekRate > -MIN_SEEK_RATE) {
 				seekRate = -MIN_SEEK_RATE;
@@ -271,6 +281,16 @@ public class VideoPlayer extends BorderPane {
 			startTimeline();
 		});
 
+	}
+
+	private void playVideo() {
+		playPauseButton.setText(">");
+		mediaView.getMediaPlayer().play();
+	}
+
+	private void pauseVideo() {
+		playPauseButton.setText("||");
+		mediaView.getMediaPlayer().pause();
 	}
 
 	public void startTimeline() {
@@ -328,7 +348,6 @@ public class VideoPlayer extends BorderPane {
 
 		mp.setOnPaused(new Runnable() {
 			public void run() {
-				System.out.println("onPaused");
 			}
 		});
 
@@ -381,7 +400,6 @@ public class VideoPlayer extends BorderPane {
 	protected void updateValues() {
 		if (currentTimeLabel != null && progressSlider != null) {
 			Platform.runLater(() -> {
-				System.out.println("Updating");
 				MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
 				Duration currentTime = mediaPlayer.getCurrentTime();
 				currentTimeLabel.setText(formatTime(currentTime, duration));
