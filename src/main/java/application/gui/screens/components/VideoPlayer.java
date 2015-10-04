@@ -1,5 +1,13 @@
 package application.gui.screens.components;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
+
+import application.gui.Window;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -7,16 +15,13 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -26,6 +31,7 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.stage.FileChooser;
 import javafx.util.Duration;
 
 public class VideoPlayer extends BorderPane {
@@ -82,6 +88,17 @@ public class VideoPlayer extends BorderPane {
 	 * Fast forwards the video.
 	 */
 	Button fastForwardButton;
+
+	/**
+	 * Button used to merge tts.
+	 */
+	Button mergeTTSButton;
+
+	/*
+	 * =====================================================================
+	 * Below are objects that aren't GUI objects.
+	 * ===================================================================
+	 */
 
 	/**
 	 * The timeline system used for seeking.
@@ -191,6 +208,10 @@ public class VideoPlayer extends BorderPane {
 
 		bottomGridPane.add(buttonBar, 1, 1);
 
+		mergeTTSButton = new Button("Merge TTS");
+
+		bottomGridPane.add(mergeTTSButton, 2, 2);
+
 		/*
 		 * <ButtonBar prefHeight="40.0" prefWidth="200.0"> <buttons> <Button
 		 * mnemonicParsing="false" text="&lt;&lt;" /> <Button
@@ -279,6 +300,107 @@ public class VideoPlayer extends BorderPane {
 
 			mediaView.getMediaPlayer().pause();
 			startTimeline();
+		});
+
+		mergeTTSButton.setOnAction(event -> {
+			// Pause the video so that the location is preserved.
+			pauseVideo();
+
+			FileChooser chooser = new FileChooser();
+			chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+			chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Wav", "*.wav"),
+					new FileChooser.ExtensionFilter("All Files", "*"));
+
+			File mp3File = chooser.showOpenDialog(Window.getPrimaryStage());
+
+			// If the file is null then exit out.
+			if (mp3File == null) {
+				System.out.println("no mp3 file chosen");
+				return;
+			}
+
+			chooser.getExtensionFilters().clear();
+			chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("MP4", "*.mp4"),
+					new FileChooser.ExtensionFilter("All Files", "*"));
+
+			File mp4File = chooser.showOpenDialog(Window.getPrimaryStage());
+
+			if (mp4File == null) {
+				System.out.println("No mp4 file chosen");
+				return;
+			}
+
+			// http://stackoverflow.com/questions/9027317/how-to-convert-milliseconds-to-hhmmss-format
+			// was used for time conversion.
+			Duration currentTime = mediaView.getMediaPlayer().getCurrentTime();
+			long millis = (long) currentTime.toMillis();
+			String output = String.format("%02d:%02d:%02d.%d", TimeUnit.MILLISECONDS.toHours(millis),
+					TimeUnit.MILLISECONDS.toMinutes(millis)
+							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
+					TimeUnit.MILLISECONDS.toSeconds(millis)
+							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)),
+					TimeUnit.MILLISECONDS.toMillis(millis)
+							- TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(millis)));
+
+			// String ffmpegCommand = "ffmpeg -y -itsoffset 00:00:30 -i " +
+			// mp4File.getAbsolutePath() + " -i "
+			// + mp3File.getAbsolutePath() + " -map 0:0 -map 1:0 -c:v copy
+			// -preset ultrafast -async 1 out.mp4";
+			// String ffmpegCommand = "mergeaudio.sh " +
+			// mp4File.getAbsolutePath() + " " + mp3File.getAbsolutePath()
+			// + "~/share/sand/4lulz.mp4 10 ~/share/sand";
+			String ffmpegCommand = "ffmpeg -y -i " + mp4File.getAbsolutePath() + " ~/share/sand/stripped.wav && ";
+			ffmpegCommand += "sox -m -v0 ~/share/sand/stripped.wav \"| sox " + mp3File.getAbsolutePath()
+					+ " -c 2 -p pad 2 \" ~/share/sand/final.wav && ";
+			ffmpegCommand += "ffmpeg -y -i " + mp4File.getAbsolutePath()
+					+ " -i ~/share/sand/final.wav -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" "
+					+ "-acodec aac -strict -2 -preset ultrafast ~/share/sand/superfinal.mp4";
+
+			System.out.println("Command:\n" + ffmpegCommand);
+
+			/*
+			 * ffmpeg -i $inputVideoFile $temporaryDirectory/stripped.wav
+			 * 
+			 * # Mute audio of the original file sox -m -v0
+			 * "|sox $inputAudioFile -p pad $secondsToInsertAt"
+			 * $temporaryDirectory/final.wav
+			 * 
+			 * ffmpeg -i $inputVideoFile -i $outputVideoFile -map 0:v -map 1:a
+			 * --strict experimental -acodec aac $outputVideoFile
+			 */
+
+			ProcessBuilder procBuilder = null;
+
+			String os = System.getProperty("os.name").toLowerCase();
+			if (os.contains("win")) {
+				procBuilder = new ProcessBuilder("cmd", "/c", ffmpegCommand);
+			} else {
+				procBuilder = new ProcessBuilder("/bin/bash", "-c", ffmpegCommand);
+			}
+
+			procBuilder.redirectErrorStream(true);
+			try {
+				Process process = procBuilder.start();
+
+				InputStream inputStream = process.getInputStream();
+				OutputStream outputStream = process.getOutputStream();
+
+				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+				String line = null;
+
+				while ((line = reader.readLine()) != null) {
+					System.out.println("Process: " + line);
+				}
+
+			} catch (Exception e) {
+				System.out.println("Failed process");
+				e.printStackTrace();
+			}
+
+			System.out.println("Current time: " + output);
+
+			playVideo();
 		});
 
 	}
