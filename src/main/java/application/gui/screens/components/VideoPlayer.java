@@ -5,6 +5,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -195,9 +196,19 @@ public class VideoPlayer extends BorderPane {
 		// Bind the value property of the slider to the progress property, so
 		// both are updated.
 
+		// Start the media.
 		startMedia();
 
-		System.out.println("Ready to view");
+		// Register the button event handlers.
+		playPauseButton.setOnAction(event -> {
+			if (playPauseButton.getText().equals(">")) {
+				playPauseButton.setText("||");
+				mediaView.getMediaPlayer().pause();
+			} else if (playPauseButton.getText().equals("||")) {
+				playPauseButton.setText(">");
+				mediaView.getMediaPlayer().play();
+			}
+		});
 
 	}
 
