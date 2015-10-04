@@ -6,20 +6,24 @@ import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
-import sun.launcher.resources.launcher;
 
 public class VideoPlayer extends BorderPane {
 
@@ -49,6 +53,32 @@ public class VideoPlayer extends BorderPane {
 	 * The current time label.
 	 */
 	Label currentTimeLabel;
+
+	/**
+	 * Bar of buttons, for control of the video.
+	 */
+	HBox buttonBar;
+
+	/**
+	 * Used to play and pause the video.
+	 */
+	Button playPauseButton;
+	/**
+	 * Steps a frame forward in the video.
+	 */
+	Button stepForwardButton;
+	/**
+	 * Steps a frame backward in the video.
+	 */
+	Button stepBackwardButton;
+	/**
+	 * Reverses the video.
+	 */
+	Button reverseVideoButton;
+	/**
+	 * Fast forwards the video.
+	 */
+	Button fastForwardButton;
 
 	public VideoPlayer() {
 
@@ -91,6 +121,9 @@ public class VideoPlayer extends BorderPane {
 
 		bottomGridPane.getRowConstraints().addAll(row1, row2);
 
+		bottomGridPane.setVgap(10);
+		bottomGridPane.setPadding(new Insets(5));
+
 		progressBar = new ProgressBar();
 		// Clamp to max
 		progressBar.setMaxWidth(Double.MAX_VALUE);
@@ -126,9 +159,27 @@ public class VideoPlayer extends BorderPane {
 
 		bottomGridPane.add(currentTimeLabel, 2, 0);
 
+		buttonBar = new HBox();
+		buttonBar.setAlignment(Pos.CENTER);
+
+		playPauseButton = new Button(">");
+		stepForwardButton = new Button("|>");
+		stepBackwardButton = new Button("<|");
+		fastForwardButton = new Button(">>");
+		reverseVideoButton = new Button("<<");
+
+		buttonBar.getChildren().addAll(reverseVideoButton, stepBackwardButton, playPauseButton, stepForwardButton,
+				fastForwardButton);
+
+		bottomGridPane.add(buttonBar, 1, 1);
+
 		/*
-		 * <Label text="Time : 0:00" GridPane.columnIndex="2"
-		 * GridPane.valignment="CENTER" />
+		 * <ButtonBar prefHeight="40.0" prefWidth="200.0"> <buttons> <Button
+		 * mnemonicParsing="false" text="&lt;&lt;" /> <Button
+		 * mnemonicParsing="false" text="&lt;|" /> <Button
+		 * mnemonicParsing="false" text="&gt;" /> <Button
+		 * mnemonicParsing="false" text="|&gt;" /> <Button
+		 * mnemonicParsing="false" text="&gt;&gt;" /> </buttons> </ButtonBar>
 		 */
 
 		setCenter(mediaView);
