@@ -155,12 +155,35 @@ public class VideoPlayer extends BorderPane {
 			}
 		});
 
+		// Value changing property for the sliding action.
 		progressSlider.valueProperty().addListener(new InvalidationListener() {
 			public void invalidated(Observable ov) {
 				if (progressSlider.isValueChanging()) {
 					// multiply duration by percentage calculated by slider
 					// position
 					mp.seek(duration.multiply(progressSlider.getValue() / 100.0));
+				}
+			}
+		});
+
+		// Value changing property for the clicking action.
+		progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				if (!progressSlider.isValueChanging()) {
+
+					Duration totalDuration = mediaView.getMediaPlayer().getTotalDuration();
+
+					MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+					if (mediaPlayer != null) {
+						double currentTime = mediaPlayer.getCurrentTime().toSeconds();
+						double sliderTime = totalDuration.multiply(progressSlider.getValue() / 100.0).toSeconds();
+
+						if (Math.abs(currentTime - sliderTime) > 1) {
+							mediaPlayer.seek(totalDuration.multiply(progressSlider.getValue() / 100.0));
+						}
+					}
 				}
 			}
 		});
