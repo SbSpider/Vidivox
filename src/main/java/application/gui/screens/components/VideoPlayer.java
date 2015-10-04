@@ -334,17 +334,11 @@ public class VideoPlayer extends BorderPane {
 			// was used for time conversion.
 			Duration currentTime = mediaView.getMediaPlayer().getCurrentTime();
 			long millis = (long) currentTime.toMillis();
-			String output = String.format("%02d:%02d:%02d.%d", TimeUnit.MILLISECONDS.toHours(millis),
-					TimeUnit.MILLISECONDS.toMinutes(millis)
-							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(millis)),
-					TimeUnit.MILLISECONDS.toSeconds(millis)
-							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(millis)),
-					TimeUnit.MILLISECONDS.toMillis(millis)
-							- TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(millis)));
+			double seconds = millis / 1000.0;
 
 			String ffmpegCommand = "ffmpeg -y -i " + mp4File.getAbsolutePath() + " ~/share/sand/stripped.wav && ";
 			ffmpegCommand += "sox -m -v0 ~/share/sand/stripped.wav \"| sox " + mp3File.getAbsolutePath()
-					+ " -c 2 -p pad 2 \" ~/share/sand/final.wav && ";
+					+ " -c 2 -p pad " + seconds + " \" ~/share/sand/final.wav && ";
 			ffmpegCommand += "ffmpeg -y -i " + mp4File.getAbsolutePath()
 					+ " -i ~/share/sand/final.wav -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" "
 					+ "-acodec aac -strict -2 -preset ultrafast ~/share/sand/superfinal.mp4";
@@ -379,8 +373,6 @@ public class VideoPlayer extends BorderPane {
 				System.out.println("Failed process");
 				e.printStackTrace();
 			}
-
-			System.out.println("Current time: " + output);
 
 			playVideo();
 		});
