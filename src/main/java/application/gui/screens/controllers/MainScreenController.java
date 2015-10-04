@@ -29,7 +29,8 @@ public class MainScreenController implements Initializable {
 		VideoPlayer player = new VideoPlayer();
 
 		mainScreen_Root.setCenter(player);
-		player.setVisible(true);
+		
+//		player.init();
 	}
 
 }
