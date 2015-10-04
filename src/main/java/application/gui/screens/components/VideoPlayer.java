@@ -342,13 +342,6 @@ public class VideoPlayer extends BorderPane {
 					TimeUnit.MILLISECONDS.toMillis(millis)
 							- TimeUnit.SECONDS.toMillis(TimeUnit.MILLISECONDS.toSeconds(millis)));
 
-			// String ffmpegCommand = "ffmpeg -y -itsoffset 00:00:30 -i " +
-			// mp4File.getAbsolutePath() + " -i "
-			// + mp3File.getAbsolutePath() + " -map 0:0 -map 1:0 -c:v copy
-			// -preset ultrafast -async 1 out.mp4";
-			// String ffmpegCommand = "mergeaudio.sh " +
-			// mp4File.getAbsolutePath() + " " + mp3File.getAbsolutePath()
-			// + "~/share/sand/4lulz.mp4 10 ~/share/sand";
 			String ffmpegCommand = "ffmpeg -y -i " + mp4File.getAbsolutePath() + " ~/share/sand/stripped.wav && ";
 			ffmpegCommand += "sox -m -v0 ~/share/sand/stripped.wav \"| sox " + mp3File.getAbsolutePath()
 					+ " -c 2 -p pad 2 \" ~/share/sand/final.wav && ";
@@ -357,17 +350,6 @@ public class VideoPlayer extends BorderPane {
 					+ "-acodec aac -strict -2 -preset ultrafast ~/share/sand/superfinal.mp4";
 
 			System.out.println("Command:\n" + ffmpegCommand);
-
-			/*
-			 * ffmpeg -i $inputVideoFile $temporaryDirectory/stripped.wav
-			 * 
-			 * # Mute audio of the original file sox -m -v0
-			 * "|sox $inputAudioFile -p pad $secondsToInsertAt"
-			 * $temporaryDirectory/final.wav
-			 * 
-			 * ffmpeg -i $inputVideoFile -i $outputVideoFile -map 0:v -map 1:a
-			 * --strict experimental -acodec aac $outputVideoFile
-			 */
 
 			ProcessBuilder procBuilder = null;
 
