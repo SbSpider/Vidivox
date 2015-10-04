@@ -81,6 +81,11 @@ public class VideoPlayer extends BorderPane {
 	 */
 	Button fastForwardButton;
 
+	// Assume a 24 fps video, which is standard. Therefore, 1 frame is
+	// 1/24th of a second. To step forward, we then increment it by that
+	// much.
+	static final double FRAME_MILLIS = 1000.0 / 24.0;
+
 	public VideoPlayer() {
 
 		mediaView = new MediaView();
@@ -208,6 +213,26 @@ public class VideoPlayer extends BorderPane {
 				playPauseButton.setText(">");
 				mediaView.getMediaPlayer().play();
 			}
+		});
+
+		stepForwardButton.setOnAction(event -> {
+			MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+			Duration currentTime = mediaPlayer.getCurrentTime();
+
+			Duration newTime = currentTime.add(new Duration(FRAME_MILLIS));
+
+			mediaPlayer.seek(newTime);
+
+		});
+
+		stepBackwardButton.setOnAction(event -> {
+			MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+			Duration currentTime = mediaPlayer.getCurrentTime();
+
+			Duration newTime = currentTime.subtract(new Duration(FRAME_MILLIS));
+
+			mediaPlayer.seek(newTime);
+
 		});
 
 	}
