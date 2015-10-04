@@ -16,9 +16,9 @@
    <bottom>
       <GridPane BorderPane.alignment="CENTER">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -27,6 +27,8 @@
          <children>
             <ProgressBar fx:id="progresSBar" maxWidth="1.7976931348623157E308" minWidth="300.0" prefWidth="300.0" progress="0.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
             <Slider prefWidth="8000.0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+            <Label alignment="CENTER" text="Frame : 0" GridPane.valignment="CENTER" />
+            <Label text="Time : 0:00" GridPane.columnIndex="2" GridPane.valignment="CENTER" />
          </children>
       </GridPane>
    </bottom>

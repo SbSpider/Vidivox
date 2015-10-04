@@ -5,6 +5,8 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
@@ -17,16 +19,36 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
+import sun.launcher.resources.launcher;
 
 public class VideoPlayer extends BorderPane {
 
+	/**
+	 * The media view;
+	 */
 	MediaView mediaView;
+	/**
+	 * The gridpane at the bottom.
+	 */
 	GridPane bottomGridPane;
+	/**
+	 * The progress bar.
+	 */
 	ProgressBar progressBar;
+	/**
+	 * The progress slider.
+	 */
 	Slider progressSlider;
-	Duration totalDuration;
-	protected Duration duration;
-	Label playTime = new Label();
+
+	/**
+	 * Current duration of the video.
+	 */
+	Duration duration;
+
+	/**
+	 * The current time label.
+	 */
+	Label currentTimeLabel;
 
 	public VideoPlayer() {
 
@@ -39,16 +61,19 @@ public class VideoPlayer extends BorderPane {
 		col1.setMinWidth(10);
 		col1.setPrefWidth(100);
 		col1.setHgrow(Priority.SOMETIMES);
+		col1.setHalignment(HPos.CENTER);
 
 		ColumnConstraints col2 = new ColumnConstraints();
 		col2.setMinWidth(10);
 		col2.setPrefWidth(100);
 		col2.setHgrow(Priority.ALWAYS);
+		col2.setHalignment(HPos.CENTER);
 
 		ColumnConstraints col3 = new ColumnConstraints();
 		col3.setMinWidth(10);
 		col3.setPrefWidth(100);
 		col3.setHgrow(Priority.SOMETIMES);
+		col3.setHalignment(HPos.CENTER);
 
 		bottomGridPane.getColumnConstraints().addAll(col1, col2, col3);
 
@@ -95,6 +120,16 @@ public class VideoPlayer extends BorderPane {
 
 		bottomGridPane.add(progressBar, 1, 0);
 		bottomGridPane.add(progressSlider, 1, 0);
+
+		currentTimeLabel = new Label();
+		currentTimeLabel.setAlignment(Pos.CENTER);
+
+		bottomGridPane.add(currentTimeLabel, 2, 0);
+
+		/*
+		 * <Label text="Time : 0:00" GridPane.columnIndex="2"
+		 * GridPane.valignment="CENTER" />
+		 */
 
 		setCenter(mediaView);
 		setBottom(bottomGridPane);
@@ -147,6 +182,7 @@ public class VideoPlayer extends BorderPane {
 			public void run() {
 				duration = mp.getMedia().getDuration();
 				updateValues();
+
 			}
 		});
 
@@ -173,15 +209,13 @@ public class VideoPlayer extends BorderPane {
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				if (!progressSlider.isValueChanging()) {
 
-					Duration totalDuration = mediaView.getMediaPlayer().getTotalDuration();
-
 					MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
 					if (mediaPlayer != null) {
 						double currentTime = mediaPlayer.getCurrentTime().toSeconds();
-						double sliderTime = totalDuration.multiply(progressSlider.getValue() / 100.0).toSeconds();
+						double sliderTime = duration.multiply(progressSlider.getValue() / 100.0).toSeconds();
 
 						if (Math.abs(currentTime - sliderTime) > 1) {
-							mediaPlayer.seek(totalDuration.multiply(progressSlider.getValue() / 100.0));
+							mediaPlayer.seek(duration.multiply(progressSlider.getValue() / 100.0));
 						}
 					}
 				}
@@ -191,17 +225,19 @@ public class VideoPlayer extends BorderPane {
 	}
 
 	protected void updateValues() {
-		if (playTime != null && progressSlider != null) {
+		if (currentTimeLabel != null && progressSlider != null) {
 			Platform.runLater(new Runnable() {
 				public void run() {
 					System.out.println("Updating");
-					Duration currentTime = mediaView.getMediaPlayer().getCurrentTime();
-					playTime.setText(formatTime(currentTime, duration));
+					MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+					Duration currentTime = mediaPlayer.getCurrentTime();
+					currentTimeLabel.setText(formatTime(currentTime, duration));
 
 					if (!progressSlider.isDisabled() && duration.greaterThan(Duration.ZERO)
 							&& !progressSlider.isValueChanging()) {
 						progressSlider.setValue(currentTime.divide(duration).toMillis() * 100.0);
 					}
+
 				}
 			});
 		}
