@@ -1,5 +1,7 @@
 package application.gui.screens.components;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -81,6 +83,19 @@ public class VideoPlayer extends BorderPane {
 	 */
 	Button fastForwardButton;
 
+	/**
+	 * The timeline system used for seeking.
+	 */
+	Timeline seekingTimeline;
+
+	/**
+	 * The rate at which to seek when fast forwarding or rewinding, in seconds
+	 * changed per seek. Default is 1.
+	 */
+	Integer seekRate = 1;
+
+	static final Integer MIN_SEEK_RATE = 2;
+
 	// Assume a 24 fps video, which is standard. Therefore, 1 frame is
 	// 1/24th of a second. To step forward, we then increment it by that
 	// much.
@@ -138,23 +153,20 @@ public class VideoPlayer extends BorderPane {
 		progressSlider.setMaxWidth(Double.MAX_VALUE);
 
 		progressSlider.valueProperty().set(0);
-		progressSlider.valueProperty().addListener(new ChangeListener<Number>() {
+		progressSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
 
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				double value = (Double) newValue / progressSlider.getMax();
+			double value = (Double) newValue / progressSlider.getMax();
 
-				// This little block just adjusts the progress so that it
-				// appears under the slider object rather than not.
-				if (value < 0.25) {
-					value += 0.02;
-				} else if (value < 0.5) {
-					value += 0.001;
-				} else if (value < 0.75) {
-					value += 0.0001;
-				}
-				progressBar.setProgress(value);
+			// This little block just adjusts the progress so that it
+			// appears under the slider object rather than not.
+			if (value < 0.25) {
+				value += 0.02;
+			} else if (value < 0.5) {
+				value += 0.001;
+			} else if (value < 0.75) {
+				value += 0.0001;
 			}
+			progressBar.setProgress(value);
 		});
 
 		bottomGridPane.add(progressBar, 1, 0);
@@ -235,6 +247,61 @@ public class VideoPlayer extends BorderPane {
 
 		});
 
+		fastForwardButton.setOnAction(event -> {
+			if (seekRate < MIN_SEEK_RATE) {
+				seekRate = MIN_SEEK_RATE;
+			} else {
+				seekRate *= 2;
+			}
+
+			// Pause the video
+			mediaView.getMediaPlayer().pause();
+			startTimeline();
+		});
+
+		reverseVideoButton.setOnAction(event -> {
+
+			if (seekRate > -MIN_SEEK_RATE) {
+				seekRate = -MIN_SEEK_RATE;
+			} else {
+				seekRate *= 2;
+			}
+
+			mediaView.getMediaPlayer().pause();
+			startTimeline();
+		});
+
+	}
+
+	public void startTimeline() {
+		// To avoid double up issues, remove the previous instance of the
+		// seeking timeline.
+		if (seekingTimeline != null) {
+			seekingTimeline.stop();
+			// Mark for garbage collection.
+			seekingTimeline = null;
+		}
+
+		seekingTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+			MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+			Duration currentTime = mediaPlayer.getCurrentTime();
+
+			mediaPlayer.seek(currentTime.add(Duration.seconds(seekRate)));
+		}));
+
+		seekingTimeline.setCycleCount(Timeline.INDEFINITE);
+		seekingTimeline.play();
+	}
+
+	public void stopTimeline() {
+		// Only work on it the timeline is not null.
+		if (seekingTimeline != null) {
+
+			seekingTimeline.stop();
+			seekRate = 1;
+
+			seekingTimeline = null;
+		}
 	}
 
 	public void startMedia() {
@@ -313,19 +380,17 @@ public class VideoPlayer extends BorderPane {
 
 	protected void updateValues() {
 		if (currentTimeLabel != null && progressSlider != null) {
-			Platform.runLater(new Runnable() {
-				public void run() {
-					System.out.println("Updating");
-					MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
-					Duration currentTime = mediaPlayer.getCurrentTime();
-					currentTimeLabel.setText(formatTime(currentTime, duration));
+			Platform.runLater(() -> {
+				System.out.println("Updating");
+				MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+				Duration currentTime = mediaPlayer.getCurrentTime();
+				currentTimeLabel.setText(formatTime(currentTime, duration));
 
-					if (!progressSlider.isDisabled() && duration.greaterThan(Duration.ZERO)
-							&& !progressSlider.isValueChanging()) {
-						progressSlider.setValue(currentTime.divide(duration).toMillis() * 100.0);
-					}
-
+				if (!progressSlider.isDisabled() && duration.greaterThan(Duration.ZERO)
+						&& !progressSlider.isValueChanging()) {
+					progressSlider.setValue(currentTime.divide(duration).toMillis() * 100.0);
 				}
+
 			});
 		}
 	}
