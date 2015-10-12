@@ -55,9 +55,9 @@ public class MainScreenController implements Initializable {
 		File videoFile = chooser.showOpenDialog(Window.getPrimaryStage());
 
 		String absolutePath = videoFile.getAbsolutePath();
-		
+
 		absolutePath = sanitiseFileName(absolutePath);
-		
+
 		Media media = new Media("file:///" + absolutePath);
 
 		videoPlayer.setNewVideoToPlay(media);
