@@ -20,7 +20,7 @@ public final class JSONConverter {
 	 */
 	public static String convertToJson(SaveFileDO saveFileDO) {
 		Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
-		String json = gson.toJson(saveFileDO);
+		String json = gson.toJson(saveFileDO, saveFileDO.getClass());
 
 		return json;
 	}

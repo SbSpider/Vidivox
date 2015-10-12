@@ -5,9 +5,14 @@ import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.concurrent.TimeUnit;
+import java.util.HashMap;
+
+import com.sun.media.jfxmedia.events.PlayerStateListener;
 
 import application.gui.Window;
+import framework.function.savefunction.DoubleSaveableObject;
+import framework.function.savefunction.SaveFileDO;
+import framework.function.savefunction.SaveableObject;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -235,7 +240,7 @@ public class VideoPlayer extends BorderPane {
 		// both are updated.
 
 		// Start the media.
-		startMedia();
+		//		startMedia();
 
 		// Register the button event handlers.
 		playPauseButton.setOnAction(event -> {
@@ -376,6 +381,10 @@ public class VideoPlayer extends BorderPane {
 
 			playVideo();
 		});
+		
+		
+		// Setup accelerators
+		
 
 	}
 
@@ -420,10 +429,10 @@ public class VideoPlayer extends BorderPane {
 		}
 	}
 
-	public void startMedia() {
+	public void startMedia(Media media) {
 
 		mediaView.setMediaPlayer(
-				new MediaPlayer(new Media("http://download.oracle.com/otndocs/products/javafx/oow2010-2.flv")));
+				new MediaPlayer(media));
 		mediaView.getMediaPlayer().setAutoPlay(true);
 		mediaView.getMediaPlayer().play();
 
@@ -548,27 +557,29 @@ public class VideoPlayer extends BorderPane {
 
 	public void setNewVideoToPlay(Media media) {
 
-		MediaPlayer mediaPlayer = new MediaPlayer(media);
-		mediaPlayer.setAutoPlay(true);
+		startMedia(media);
 
-		mediaPlayer.seek(new Duration(0));
+	}
 
-		// Unload existing player
-		MediaPlayer existingMedia = mediaView.getMediaPlayer();
-		if (existingMedia != null) {
-			existingMedia.stop();
-			existingMedia = null;
-		}
+	public void useSaveFile(SaveFileDO saveFile) {
+		HashMap<String, SaveableObject> saveableObjects = saveFile.getSaveableObjects();
 
-		mediaView.setMediaPlayer(mediaPlayer);
+		progressSlider.setValue((double) saveableObjects.get("progressSlider").getValue());
 
-		mediaPlayer.setOnReady(new Runnable() {
+	}
 
-			@Override
-			public void run() {
-				duration = mediaView.getMediaPlayer().getTotalDuration();
-			}
-		});
+	/**
+	 * Generates a save file.
+	 * 
+	 * @return
+	 */
+	public SaveFileDO generateSaveFile() {
+		SaveFileDO saveFile = new SaveFileDO();
 
+		HashMap<String, SaveableObject> saveableObjects = saveFile.getSaveableObjects();
+
+		saveableObjects.put("progressSlider", new DoubleSaveableObject(progressSlider.getValue()));
+
+		return saveFile;
 	}
 }

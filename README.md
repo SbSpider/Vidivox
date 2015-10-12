@@ -2,14 +2,10 @@
 
 To run the application, ensure that the java 8 jvm is being used. This on testing computers can be found at /usr/lib/jvm/java-8-oracle.
 
-Currently, the easiest supported codecs are AAC encoded MP4 files.
+Currently, the easiest supported codecs are AAC encoded MP4 files. Further codecs will be supported in future
+releases.
 
-### What is this repository for? ###
+The code can be built if required by using the gradle build tool.
 
-* This will contain the code for the Vidivox project.
-* 1.0
-
-### How do I get set up? ###
-
-* Use gradle to build the code.
-* Dependencies
+The project also will also have a save file functionality for saving the project, which will save
+the values of several of the buttons and sliders.
