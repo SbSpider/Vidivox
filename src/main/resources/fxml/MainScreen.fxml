@@ -25,7 +25,8 @@
 					<menus>
 						<Menu mnemonicParsing="false" text="File">
 							<items>
-								<MenuItem mnemonicParsing="false" text="Close" onAction="#closeButton"  />
+                        <MenuItem mnemonicParsing="false" onAction="#onOpenVideo" text="Open Video" />
+								<MenuItem mnemonicParsing="false" onAction="#closeButton" text="Close" />
 							</items>
 						</Menu>
 						<Menu mnemonicParsing="false" text="Edit">

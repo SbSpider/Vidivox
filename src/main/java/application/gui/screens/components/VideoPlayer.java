@@ -541,4 +541,34 @@ public class VideoPlayer extends BorderPane {
 			}
 		}
 	}
+
+	public MediaView getMediaView() {
+		return mediaView;
+	}
+
+	public void setNewVideoToPlay(Media media) {
+
+		MediaPlayer mediaPlayer = new MediaPlayer(media);
+		mediaPlayer.setAutoPlay(true);
+
+		mediaPlayer.seek(new Duration(0));
+
+		// Unload existing player
+		MediaPlayer existingMedia = mediaView.getMediaPlayer();
+		if (existingMedia != null) {
+			existingMedia.stop();
+			existingMedia = null;
+		}
+
+		mediaView.setMediaPlayer(mediaPlayer);
+
+		mediaPlayer.setOnReady(new Runnable() {
+
+			@Override
+			public void run() {
+				duration = mediaView.getMediaPlayer().getTotalDuration();
+			}
+		});
+
+	}
 }
