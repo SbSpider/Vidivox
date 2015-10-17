@@ -19,8 +19,16 @@
 }
 
 #titleText {
-	-fx-background-color:blue;
+	-fx-background-color: blue;
 	-fx-font-weight : bold;	
 	-fx-font-family : "Times New Roman";
 	-fx-font-size: 32px;
 } 
+
+#mediaView {
+	-fx-background-color : black;
+}
+
+#videoPlayer {
+	-fx-background-color : #BFB8B3;
+}
