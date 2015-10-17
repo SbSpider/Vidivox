@@ -7,9 +7,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.HashMap;
 
-import com.sun.media.jfxmedia.events.PlayerStateListener;
+import org.apache.commons.io.FilenameUtils;
 
 import application.gui.Window;
+import application.gui.screens.controllers.TTSMenuController;
 import framework.function.savefunction.DoubleSaveableObject;
 import framework.function.savefunction.SaveFileDO;
 import framework.function.savefunction.SaveableObject;
@@ -20,15 +21,23 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -36,7 +45,12 @@ import javafx.scene.layout.RowConstraints;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class VideoPlayer extends BorderPane {
@@ -95,7 +109,12 @@ public class VideoPlayer extends BorderPane {
 	Button fastForwardButton;
 
 	/**
-	 * Button used to merge tts.
+	 * Button used to merge generic audio.
+	 */
+	Button mergeAudioButton;
+
+	/**
+	 * Button to merge tts.
 	 */
 	Button mergeTTSButton;
 
@@ -122,6 +141,8 @@ public class VideoPlayer extends BorderPane {
 	// 1/24th of a second. To step forward, we then increment it by that
 	// much.
 	static final double FRAME_MILLIS = 1000.0 / 24.0;
+	private FlowPane bottomMergingButtonFlowPane;
+	private Text titleText;
 
 	public VideoPlayer() {
 
@@ -213,9 +234,17 @@ public class VideoPlayer extends BorderPane {
 
 		bottomGridPane.add(buttonBar, 1, 1);
 
+		mergeAudioButton = new Button("Merge Audio");
 		mergeTTSButton = new Button("Merge TTS");
 
-		bottomGridPane.add(mergeTTSButton, 2, 2);
+		bottomMergingButtonFlowPane = new FlowPane();
+		bottomMergingButtonFlowPane.setOrientation(Orientation.HORIZONTAL);
+
+		bottomMergingButtonFlowPane.getChildren().addAll(mergeAudioButton, mergeTTSButton);
+
+		// bottomGridPane.add(mergeAudioButton, 2, 2);
+		// bottomGridPane.add(mergeTTSButton, 2, 2);
+		bottomGridPane.add(bottomMergingButtonFlowPane, 2, 2);
 
 		/*
 		 * <ButtonBar prefHeight="40.0" prefWidth="200.0"> <buttons> <Button
@@ -225,9 +254,6 @@ public class VideoPlayer extends BorderPane {
 		 * mnemonicParsing="false" text="|&gt;" /> <Button
 		 * mnemonicParsing="false" text="&gt;&gt;" /> </buttons> </ButtonBar>
 		 */
-
-		setCenter(mediaView);
-		setBottom(bottomGridPane);
 
 		// this.getStylesheets().add("/css/VideoPlayer_Base.css");
 		this.setStyle("-fx-background-color : white");
@@ -240,7 +266,7 @@ public class VideoPlayer extends BorderPane {
 		// both are updated.
 
 		// Start the media.
-		//		startMedia();
+		// startMedia();
 
 		// Register the button event handlers.
 		playPauseButton.setOnAction(event -> {
@@ -307,7 +333,7 @@ public class VideoPlayer extends BorderPane {
 			startTimeline();
 		});
 
-		mergeTTSButton.setOnAction(event -> {
+		mergeAudioButton.setOnAction(event -> {
 			// Pause the video so that the location is preserved.
 			pauseVideo();
 
@@ -324,68 +350,203 @@ public class VideoPlayer extends BorderPane {
 				return;
 			}
 
-			chooser.getExtensionFilters().clear();
-			chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("MP4", "*.mp4"),
-					new FileChooser.ExtensionFilter("All Files", "*"));
+			File saveFile = getOutputSaveFile();
 
-			File mp4File = chooser.showOpenDialog(Window.getPrimaryStage());
+			if (saveFile != null) {
+				// Handle the cases where for some reason, the extension is not
+				// appended. Check the three main endings for mp4's - .mp4, m4v
+				// and
+				// .m4a
+				if (!saveFile.getAbsolutePath().endsWith(".mp4") && !saveFile.getAbsolutePath().endsWith(".m4a")
+						&& !saveFile.getAbsolutePath().endsWith(".m4v")) {
+					saveFile = new File(saveFile.getAbsolutePath() + ".mp4");
+				}
 
-			if (mp4File == null) {
-				System.out.println("No mp4 file chosen");
+				String outputName = saveFile.getAbsolutePath();
+				mergeWithAudioAtLocation(mp3File.getAbsolutePath(), outputName);
+
+				startMedia(new Media("file:///" + saveFile.getAbsolutePath().replaceAll("\\", "/")));
+			} else {
+				if (playPauseButton.getText().equals("||")) {
+					playPauseButton.fire();
+				}
+			}
+		});
+
+		mergeTTSButton.setOnAction(event -> {
+			String filename = null;
+			if (mediaView.getMediaPlayer() != null && mediaView.getMediaPlayer().getMedia() != null) {
+				filename = mediaView.getMediaPlayer().getMedia().getSource();
+			} else {
+				Alert alert = new Alert(AlertType.ERROR,
+						"Please open a video first, before attempting to add text to speech.", ButtonType.OK);
+				alert.setWidth(400);
+				alert.setHeight(300);
+				alert.showAndWait();
 				return;
 			}
 
-			// http://stackoverflow.com/questions/9027317/how-to-convert-milliseconds-to-hhmmss-format
-			// was used for time conversion.
-			Duration currentTime = mediaView.getMediaPlayer().getCurrentTime();
-			long millis = (long) currentTime.toMillis();
-			double seconds = millis / 1000.0;
-
-			String ffmpegCommand = "ffmpeg -y -i " + mp4File.getAbsolutePath() + " ~/share/sand/stripped.wav && ";
-			ffmpegCommand += "sox -m -v0 ~/share/sand/stripped.wav \"| sox " + mp3File.getAbsolutePath()
-					+ " -c 2 -p pad " + seconds + " \" ~/share/sand/final.wav && ";
-			ffmpegCommand += "ffmpeg -y -i " + mp4File.getAbsolutePath()
-					+ " -i ~/share/sand/final.wav -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" "
-					+ "-acodec aac -strict -2 -preset ultrafast ~/share/sand/superfinal.mp4";
-
-			System.out.println("Command:\n" + ffmpegCommand);
-
-			ProcessBuilder procBuilder = null;
-
-			String os = System.getProperty("os.name").toLowerCase();
-			if (os.contains("win")) {
-				procBuilder = new ProcessBuilder("cmd", "/c", ffmpegCommand);
-			} else {
-				procBuilder = new ProcessBuilder("/bin/bash", "-c", ffmpegCommand);
-			}
-
-			procBuilder.redirectErrorStream(true);
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/TTSMenu.fxml"));
+			Parent ttsRoot = null;
 			try {
-				Process process = procBuilder.start();
-
-				InputStream inputStream = process.getInputStream();
-				OutputStream outputStream = process.getOutputStream();
-
-				BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-				String line = null;
-
-				while ((line = reader.readLine()) != null) {
-					System.out.println("Process: " + line);
-				}
-
+				ttsRoot = loader.load();
 			} catch (Exception e) {
-				System.out.println("Failed process");
+				System.out.println("Fialed to load fxml");
 				e.printStackTrace();
 			}
+			Scene scene = new Scene(ttsRoot);
 
-			playVideo();
+			// Pause the video
+			if (playPauseButton.getText().equals(">")) {
+				playPauseButton.fire();
+			}
+
+			final Stage dialog = new Stage();
+			dialog.initModality(Modality.APPLICATION_MODAL);
+			dialog.initOwner(Window.getPrimaryStage());
+
+			dialog.setScene(scene);
+			dialog.showAndWait();
+
+			TTSMenuController controller = loader.<TTSMenuController> getController();
+			String ttsFilename = controller.getTTSFilename();
+
+			// Quit if the returned file is null i.e. they closed the box.
+			if (ttsFilename == null) {
+				if (playPauseButton.getText().equals("||")) {
+					playPauseButton.fire();
+				}
+				return;
+			}
+
+			// FileChooser chooser = getChooserDialog("Please select location to
+			// save combined output file to");
+			File saveFile = getOutputSaveFile();
+
+			if (saveFile != null) {
+				// Handle the cases where for some reason, the extension is not
+				// appended. Check the three main endings for mp4's - .mp4, m4v
+				// and
+				// .m4a
+				if (!saveFile.getAbsolutePath().endsWith(".mp4") && !saveFile.getAbsolutePath().endsWith(".m4a")
+						&& !saveFile.getAbsolutePath().endsWith(".m4v")) {
+					saveFile = new File(saveFile.getAbsolutePath() + ".mp4");
+				}
+
+				String outputName = saveFile.getAbsolutePath();
+				mergeWithAudioAtLocation(ttsFilename, outputName);
+
+				startMedia(new Media("file:///" + saveFile.getAbsolutePath()));
+			} else {
+				if (playPauseButton.getText().equals("||")) {
+					playPauseButton.fire();
+				}
+			}
 		});
-		
-		
-		// Setup accelerators
-		
 
+		titleText = new Text();
+		titleText.setId("titleText");
+		titleText.setText("Please select a video to begin");
+
+		setTop(titleText);
+		setCenter(mediaView);
+		setBottom(bottomGridPane);
+
+		// Set the top to be centred.
+		setAlignment(getTop(), Pos.CENTER);
+
+	}
+
+	private File getOutputSaveFile() {
+		FileChooser chooser = new FileChooser();
+		chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+
+		chooser.setTitle("Please select location to save output to");
+		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Mp4", "*.mp4"));
+		chooser.setInitialFileName("FinalOutput");
+
+		File saveFile = chooser.showSaveDialog(Window.getPrimaryStage());
+		return saveFile;
+	}
+
+	private void mergeWithAudioAtLocation(String mp3File, String outputFile) {
+		// FileChooser chooser = new FileChooser();
+		// chooser.setInitialDirectory(new
+		// File(System.getProperty("user.home")));
+		// chooser.getExtensionFilters().addAll(new
+		// FileChooser.ExtensionFilter("MP4", "*.mp4"),
+		// new FileChooser.ExtensionFilter("All Files", "*"));
+		//
+		// File mp4File = chooser.showOpenDialog(Window.getPrimaryStage());
+		//
+		// if (mp4File == null) {
+		// System.out.println("No mp4 file chosen");
+		// return;
+		// }
+		String mp4FilePath = mediaView.getMediaPlayer().getMedia().getSource();
+		mp4FilePath = mp4FilePath.substring("file:///".length());
+		File mp4File = new File(mp4FilePath);
+
+		// http://stackoverflow.com/questions/9027317/how-to-convert-milliseconds-to-hhmmss-format
+		// was used for time conversion.
+		Duration currentTime = mediaView.getMediaPlayer().getCurrentTime();
+		long millis = (long) currentTime.toMillis();
+		double seconds = millis / 1000.0;
+
+		String ffmpegCommand = "ffmpeg -y -i " + mp4File.getAbsolutePath() + " ~/stripped.wav && ";
+		ffmpegCommand += "sox -m -v0 ~/stripped.wav \"| sox " + mp3File + " -c 2 -p pad " + seconds
+				+ " \" ~/final.wav && ";
+		ffmpegCommand += "ffmpeg -y -i " + mp4File.getAbsolutePath()
+				+ " -i ~/final.wav -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" "
+				+ "-acodec aac -strict -2 -preset ultrafast " + outputFile + " && " + "rm ~/stripped.wav ~/final.wav";
+
+		System.out.println("Command:\n" + ffmpegCommand);
+
+		ProcessBuilder procBuilder = null;
+
+		String os = System.getProperty("os.name").toLowerCase();
+		if (os.contains("win")) {
+			procBuilder = new ProcessBuilder("cmd", "/c", ffmpegCommand);
+		} else {
+			procBuilder = new ProcessBuilder("/bin/bash", "-c", ffmpegCommand);
+		}
+
+		Alert convertAlert = new Alert(AlertType.INFORMATION, "Merging audio file into video", ButtonType.OK);
+		convertAlert.setWidth(400);
+		convertAlert.setHeight(300);
+		convertAlert.initModality(Modality.APPLICATION_MODAL);
+		convertAlert.initOwner(Window.getPrimaryStage());
+
+		convertAlert.show();
+
+		procBuilder.redirectErrorStream(true);
+		try {
+			Process process = procBuilder.start();
+
+			InputStream inputStream = process.getInputStream();
+			OutputStream outputStream = process.getOutputStream();
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+			String line = null;
+
+			while ((line = reader.readLine()) != null) {
+				System.out.println("Process: " + line);
+			}
+
+		} catch (Exception e) {
+			System.out.println("Failed process");
+			e.printStackTrace();
+		}
+
+		convertAlert.close();
+
+		Alert convertedAlert = new Alert(AlertType.INFORMATION,
+				"Video has been converted. Please open the saved location using the open video command to view.",
+				ButtonType.OK);
+		convertedAlert.setWidth(400);
+		convertedAlert.setHeight(300);
+		convertedAlert.showAndWait();
 	}
 
 	private void playVideo() {
@@ -431,10 +592,19 @@ public class VideoPlayer extends BorderPane {
 
 	public void startMedia(Media media) {
 
-		mediaView.setMediaPlayer(
-				new MediaPlayer(media));
-		mediaView.getMediaPlayer().setAutoPlay(true);
-		mediaView.getMediaPlayer().play();
+		MediaPlayer mediaPlayer = new MediaPlayer(media);
+		mediaPlayer.setAutoPlay(true);
+
+		mediaPlayer.seek(new Duration(0));
+
+		// Unload existing player
+		MediaPlayer existingMedia = mediaView.getMediaPlayer();
+		if (existingMedia != null) {
+			existingMedia.stop();
+			existingMedia = null;
+		}
+
+		mediaView.setMediaPlayer(mediaPlayer);
 
 		MediaPlayer mp = mediaView.getMediaPlayer();
 
@@ -499,6 +669,8 @@ public class VideoPlayer extends BorderPane {
 				}
 			}
 		});
+
+		titleText.setText("Playing : " + FilenameUtils.getBaseName(media.getSource()));
 
 	}
 

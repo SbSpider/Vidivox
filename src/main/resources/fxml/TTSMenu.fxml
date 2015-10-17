@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.BorderPane?>
+
+<BorderPane prefHeight="250.0" prefWidth="500.0"
+	xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1"
+	fx:controller="application.gui.screens.controllers.TTSMenuController">
+	<bottom>
+		<GridPane minWidth="0.0" BorderPane.alignment="CENTER">
+			<columnConstraints>
+				<ColumnConstraints hgrow="ALWAYS" minWidth="10.0"
+					prefWidth="382.0" />
+				<ColumnConstraints hgrow="ALWAYS" percentWidth="0.0" />
+				<ColumnConstraints hgrow="ALWAYS" percentWidth="0.0" />
+			</columnConstraints>
+			<rowConstraints>
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="SOMETIMES" />
+			</rowConstraints>
+			<children>
+				<Region minHeight="0.0" minWidth="0.0" prefHeight="30.0"
+					prefWidth="401.0" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" />
+				<Button fx:id="MergeButton" mnemonicParsing="false" onAction="#handleMerge"
+					prefHeight="31.0" prefWidth="80.0" text="Merge"
+					GridPane.columnIndex="2" GridPane.halignment="RIGHT"
+					GridPane.hgrow="NEVER" />
+				<Label text="   Note: Maximum of 20 words" />
+				<Button fx:id="previewButton" mnemonicParsing="false"
+					onAction="#handlePreviewButton" prefWidth="100.0" text="Preview"
+					GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" />
+			</children>
+		</GridPane>
+	</bottom>
+	<center>
+		<GridPane BorderPane.alignment="CENTER">
+			<columnConstraints>
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="5.0"
+					prefWidth="100.0" />
+				<ColumnConstraints hgrow="ALWAYS" minWidth="10.0"
+					prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="5.0"
+					prefWidth="100.0" />
+			</columnConstraints>
+			<rowConstraints>
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="ALWAYS" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0"
+					vgrow="SOMETIMES" />
+			</rowConstraints>
+			<children>
+				<TextArea fx:id="UserTextField" prefHeight="200.0"
+					prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+				<Label text="Enter Text To Convert: " GridPane.columnIndex="1"
+					GridPane.halignment="CENTER" />
+			</children>
+		</GridPane>
+	</center>
+</BorderPane>

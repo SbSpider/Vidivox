@@ -44,6 +44,8 @@ public class MainScreenController implements Initializable {
 	MenuItem openProjectMenuItem;
 	@FXML
 	MenuItem closeWindowMenuItem;
+	@FXML
+	MenuItem ttsMenuItem;
 
 	/**
 	 * Initializes the screen.
