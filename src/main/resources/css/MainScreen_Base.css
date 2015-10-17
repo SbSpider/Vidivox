@@ -22,7 +22,7 @@
 	-fx-background-color: blue;
 	-fx-font-weight : bold;	
 	-fx-font-family : "Times New Roman";
-	-fx-font-size: 32px;
+	-fx-font-size: 32.0px;
 } 
 
 #mediaView {
@@ -31,4 +31,7 @@
 
 #videoPlayer {
 	-fx-background-color : #BFB8B3;
+	
+  	-fx-border-color: linear-gradient(from 0% 0% to 0% 100%, lightgrey, grey);
+  	-fx-border-width: 7.5;	
 }
