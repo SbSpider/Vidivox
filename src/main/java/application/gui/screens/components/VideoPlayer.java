@@ -145,9 +145,8 @@ public class VideoPlayer extends BorderPane {
 
 	public VideoPlayer() {
 
-		
 		setId("videoPlayer");
-		
+
 		mediaView = new MediaView();
 		mediaView.setId("mediaView");
 
