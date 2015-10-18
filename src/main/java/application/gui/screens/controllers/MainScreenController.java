@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
 import application.gui.Window;
+import application.gui.screens.components.TreeViewDirectoryViewer;
 import application.gui.screens.components.VideoPlayer;
 import framework.component.PrefFileChooser;
 import framework.savefunction.JSONConverter;
@@ -20,6 +21,7 @@ import framework.savefunction.SaveFileDO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
@@ -63,6 +65,7 @@ public class MainScreenController implements Initializable {
 	SaveFileDO projectFile;
 	@FXML
 	MenuItem saveProjectAsMenuItem;
+	TreeViewDirectoryViewer dirTreeView;
 
 	/**
 	 * Initializes the screen.
@@ -70,18 +73,21 @@ public class MainScreenController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		videoPlayer = new VideoPlayer();
-
-		mainScreen_Root.setCenter(videoPlayer);
+		dirTreeView = new TreeViewDirectoryViewer();
 
 		// Add acellerators
 		openVideoMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
-
 		// Until saveProejct is enabled, acceleator for saveproject as is Ctrl +
 		// s
 		saveProjectAsMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
-
+		openProjectMenuItem.setAccelerator(
+				new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN));
 		// Deactivate normal save until a project exists
 		saveProjectMenuItem.setDisable(true);
+
+		// Set locations
+		mainScreen_Root.setCenter(videoPlayer);
+		mainScreen_Root.setLeft(dirTreeView);
 
 	}
 
@@ -179,6 +185,8 @@ public class MainScreenController implements Initializable {
 		SaveFileDO saveFileDO = (SaveFileDO) ois.readObject();
 
 		videoPlayer.useSaveFile(saveFileDO);
+
+		initTreeview(saveFile);
 	}
 
 	/**
@@ -219,6 +227,15 @@ public class MainScreenController implements Initializable {
 		saveProjectMenuItem.setDisable(false);
 		saveProjectMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 
+		initTreeview(saveFile);
+
+	}
+
+	private void initTreeview(File saveFile) throws IOException {
+		dirTreeView = new TreeViewDirectoryViewer(saveFile.getParentFile().getParentFile());
+		dirTreeView.setupTreeView();
+
+		mainScreen_Root.setLeft(dirTreeView);
 	}
 
 }
