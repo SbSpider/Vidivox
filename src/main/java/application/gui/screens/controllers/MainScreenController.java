@@ -18,16 +18,21 @@ import application.gui.Window;
 import application.gui.screens.components.VideoPlayer;
 import framework.component.PrefFileChooser;
 import framework.component.TreeViewDirectoryViewer;
+import framework.media.conversion.FFMPEGConverterTask;
 import framework.savefunction.JSONConverter;
 import framework.savefunction.SaveFileDO;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Dialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -36,6 +41,8 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.media.Media;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.Duration;
+import javafx.stage.Stage;
 
 /**
  * THe controller for the main screen.
@@ -91,6 +98,44 @@ public class MainScreenController implements Initializable {
 		mainScreen_Root.setCenter(videoPlayer);
 		mainScreen_Root.setLeft(dirTreeView);
 
+		Button bt = new Button();
+		mainScreen_Root.setBottom(bt);
+
+		/*
+		 * ffmpeg -y -i /home/spider/share/A4/bigbuckbunny206_2.mp4
+		 * ~/stripped.wav && sox -m -v0 ~/stripped.wav
+		 * "| sox /home/spider/share/temp/asda.wav -c 2 -p pad 3.349 "
+		 * ~/final.wav && ffmpeg -y -i
+		 * /home/spider/share/A4/bigbuckbunny206_2.mp4 -i ~/final.wav
+		 * -filter_complex
+		 * "[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge"
+		 * -acodec aac -strict -2 -preset ultrafast
+		 * /home/spider/share/temp/sada.mp4 && rm ~/stripped.wav ~/final.wav
+		 * 
+		 */
+		bt.setOnAction(event -> {
+			// FFMPEGConverterTask task = new
+			// FFMPEGConverterTask("/home/spider/share/temp/asda.wav",
+			// "/home/spider/share/A4/bigbuckbunny206_2.mp4",
+			// "/home/spider/share/temp/sada.mp4");
+			FFMPEGConverterTask task = new FFMPEGConverterTask(
+					"ffmpeg -y -i /home/spider/share/temp/bigbuckbunny206_2.mp4 -i ~/final.wav -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" -acodec aac -strict -2 -preset ultrafast /home/spider/share/temp/final.mp4");
+			task.setDuration(Duration.minutes(1));
+
+			Thread thread = new Thread(task);
+			thread.setDaemon(false);
+			thread.start();
+
+			ProgressBar bar = new ProgressBar();
+			bar.progressProperty().bind(task.progressProperty());
+			
+
+			task.setOnSucceeded(event2 ->{
+				bar.setVisible(false);
+			});
+			
+			mainScreen_Root.setRight(bar);
+		});
 	}
 
 	@FXML
