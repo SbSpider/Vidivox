@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
+import org.apache.commons.io.FilenameUtils;
+
 import application.gui.Window;
 import application.gui.screens.components.TreeViewDirectoryViewer;
 import application.gui.screens.components.VideoPlayer;
@@ -213,6 +215,10 @@ public class MainScreenController implements Initializable {
 			return;
 		}
 
+		if (!FilenameUtils.isExtension(saveFile.getAbsolutePath(), ".vvoxproj")) {
+			saveFile = new File(saveFile.getAbsolutePath() + ".vvoxproj");
+		}
+
 		projectFile = new SaveFileDO();
 		// Sets the save file location
 		projectFile.setSaveFilename(saveFile.getAbsolutePath());
@@ -232,7 +238,7 @@ public class MainScreenController implements Initializable {
 	}
 
 	private void initTreeview(File saveFile) throws IOException {
-		dirTreeView = new TreeViewDirectoryViewer(saveFile.getParentFile().getParentFile());
+		dirTreeView = new TreeViewDirectoryViewer(saveFile.getParentFile());
 		dirTreeView.setupTreeView();
 
 		mainScreen_Root.setLeft(dirTreeView);
