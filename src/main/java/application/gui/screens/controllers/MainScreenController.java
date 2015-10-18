@@ -15,9 +15,9 @@ import java.util.ResourceBundle;
 import org.apache.commons.io.FilenameUtils;
 
 import application.gui.Window;
-import application.gui.screens.components.TreeViewDirectoryViewer;
 import application.gui.screens.components.VideoPlayer;
 import framework.component.PrefFileChooser;
+import framework.component.TreeViewDirectoryViewer;
 import framework.savefunction.JSONConverter;
 import framework.savefunction.SaveFileDO;
 import javafx.event.ActionEvent;
