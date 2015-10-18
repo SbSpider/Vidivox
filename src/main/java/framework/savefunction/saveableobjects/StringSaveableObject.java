@@ -1,4 +1,4 @@
-package framework.savefunction;
+package framework.savefunction.saveableobjects;
 
 public class StringSaveableObject extends SaveableObject {
 

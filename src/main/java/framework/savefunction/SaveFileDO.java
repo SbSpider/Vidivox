@@ -1,9 +1,12 @@
 package framework.savefunction;
 
+import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 
 import org.apache.commons.io.FilenameUtils;
+
+import framework.savefunction.saveableobjects.SaveableObject;
 
 public class SaveFileDO implements Serializable {
 
@@ -32,7 +35,7 @@ public class SaveFileDO implements Serializable {
 	public void setSaveFilename(String saveFilename) {
 		this.saveFilename = saveFilename;
 
-		this.saveDirectory = FilenameUtils.getBaseName(saveFilename);
+		this.saveDirectory = new File(saveFilename).getParent();
 	}
 
 	public HashMap<String, SaveableObject> getSaveableObjects() {

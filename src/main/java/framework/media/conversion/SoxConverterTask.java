@@ -20,12 +20,13 @@ public class SoxConverterTask extends Task<Void> {
 		command = "sox -m ";
 	}
 
-	public SoxConverterTask(String commnad) {
+	public SoxConverterTask(String command) {
 		this.command = command;
 	}
 
-	public SoxConverterTask(String silencedInputPath, String actualInputPath, int seconds, String outputFilePath) {
-		command = "-v0 " + silencedInputPath + " \"| sox " + actualInputPath + " -c 2 -p pad " + seconds + " \" "
+	public SoxConverterTask(String silencedInputPath, String actualInputPath, double seconds, String outputFilePath) {
+		this();
+		command += "-v0 " + silencedInputPath + " \"| sox " + actualInputPath + " -c 2 -p pad " + seconds + " \" "
 				+ outputFilePath;
 	}
 
@@ -34,6 +35,9 @@ public class SoxConverterTask extends Task<Void> {
 
 		ProcessBuilder procBulder = new ProcessBuilder("/bin/bash", "-c", command);
 		procBulder.redirectErrorStream(true);
+		
+		System.out.println("Command:\n");
+		System.out.println(command);
 
 		try {
 			Process process = procBulder.start();

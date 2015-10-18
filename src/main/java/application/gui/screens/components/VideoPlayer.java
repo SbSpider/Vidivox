@@ -11,11 +11,14 @@ import org.apache.commons.io.FilenameUtils;
 
 import application.gui.Window;
 import application.gui.screens.controllers.TTSMenuController;
+import framework.ScratchDir;
 import framework.component.PrefFileChooser;
-import framework.savefunction.DoubleSaveableObject;
+import framework.media.conversion.FFMPEGConverterTask;
+import framework.media.conversion.SoxConverterTask;
 import framework.savefunction.SaveFileDO;
-import framework.savefunction.SaveableObject;
-import framework.savefunction.StringSaveableObject;
+import framework.savefunction.saveableobjects.DoubleSaveableObject;
+import framework.savefunction.saveableobjects.SaveableObject;
+import framework.savefunction.saveableobjects.StringSaveableObject;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -50,6 +53,7 @@ import javafx.scene.media.MediaView;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -117,6 +121,8 @@ public class VideoPlayer extends BorderPane {
 	 * Button to merge tts.
 	 */
 	Button mergeTTSButton;
+
+	ProgressBar conversionProgressBar;
 
 	/*
 	 * =====================================================================
@@ -248,6 +254,11 @@ public class VideoPlayer extends BorderPane {
 		// bottomGridPane.add(mergeAudioButton, 2, 2);
 		// bottomGridPane.add(mergeTTSButton, 2, 2);
 		bottomGridPane.add(bottomMergingButtonFlowPane, 2, 2);
+
+		conversionProgressBar = new ProgressBar();
+		conversionProgressBar.setProgress(0);
+
+		bottomGridPane.add(conversionProgressBar, 0, 2);
 
 		/*
 		 * <ButtonBar prefHeight="40.0" prefWidth="200.0"> <buttons> <Button
@@ -491,60 +502,159 @@ public class VideoPlayer extends BorderPane {
 		long millis = (long) currentTime.toMillis();
 		double seconds = millis / 1000.0;
 
-		String ffmpegCommand = "ffmpeg -y -i " + mp4File.getAbsolutePath() + " ~/stripped.wav && ";
-		ffmpegCommand += "sox -m -v0 ~/stripped.wav \"| sox " + mp3File + " -c 2 -p pad " + seconds
-				+ " \" ~/final.wav && ";
-		ffmpegCommand += "ffmpeg -y -i " + mp4File.getAbsolutePath()
-				+ " -i ~/final.wav -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" "
-				+ "-acodec aac -strict -2 -preset ultrafast " + outputFile + " && " + "rm ~/stripped.wav ~/final.wav";
+		System.out.println();
+		System.out.println();
+		System.out.println(ScratchDir.getScratchDir().getAbsolutePath());
+		System.out.println();
+		System.out.println();
 
-		System.out.println("Command:\n" + ffmpegCommand);
+		File tempAudioFile = new File(ScratchDir.getScratchDir().getAbsolutePath() + "/temp.wav");
+		FFMPEGConverterTask stripTask = new FFMPEGConverterTask(mp4File.getAbsolutePath(),
+				tempAudioFile.getAbsolutePath());
 
-		ProcessBuilder procBuilder = null;
+		Thread thread = new Thread(stripTask);
+		thread.setDaemon(false);
+		thread.start();
 
-		String os = System.getProperty("os.name").toLowerCase();
-		if (os.contains("win")) {
-			procBuilder = new ProcessBuilder("cmd", "/c", ffmpegCommand);
-		} else {
-			procBuilder = new ProcessBuilder("/bin/bash", "-c", ffmpegCommand);
-		}
-
-		Alert convertAlert = new Alert(AlertType.INFORMATION, "Merging audio file into video", ButtonType.OK);
-		convertAlert.setWidth(400);
-		convertAlert.setHeight(300);
-		convertAlert.initModality(Modality.APPLICATION_MODAL);
-		convertAlert.initOwner(Window.getPrimaryStage());
-
-		convertAlert.show();
-
-		procBuilder.redirectErrorStream(true);
+		// Audio strip does not take time.
 		try {
-			Process process = procBuilder.start();
-
-			InputStream inputStream = process.getInputStream();
-			OutputStream outputStream = process.getOutputStream();
-
-			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-			String line = null;
-
-			while ((line = reader.readLine()) != null) {
-				System.out.println("Process: " + line);
-			}
-
-		} catch (Exception e) {
-			System.out.println("Failed process");
+			thread.join();
+		} catch (InterruptedException e) {
+			System.out.println("Interupted");
 			e.printStackTrace();
 		}
 
-		convertAlert.close();
+		File tempFinalAudioFile = new File(ScratchDir.getScratchDir().getAbsolutePath() + "/final.wav");
+		SoxConverterTask silenceTask = new SoxConverterTask(tempAudioFile.getAbsolutePath(), mp3File, seconds,
+				tempFinalAudioFile.getAbsolutePath());
 
-		Alert convertedAlert = new Alert(AlertType.INFORMATION,
-				"Video has been converted. Please open the saved location using the open video command to view.",
-				ButtonType.OK);
-		convertedAlert.setWidth(400);
-		convertedAlert.setHeight(300);
-		convertedAlert.showAndWait();
+		thread = new Thread(silenceTask);
+		thread.setDaemon(false);
+		thread.start();
+
+		// Audio silence does not take time.
+		try {
+			thread.join();
+		} catch (InterruptedException e) {
+			System.out.println("Interuptted");
+			e.printStackTrace();
+		}
+
+		// Delete the audio file being used temporarily.
+		tempAudioFile.delete();
+
+		System.out.println("Starting sidechain");
+
+		FFMPEGConverterTask sideChainMergeTask = new FFMPEGConverterTask(tempFinalAudioFile.getAbsolutePath(),
+				mp4File.getAbsolutePath(), outputFile);
+
+		// Set the duration of the video.
+		sideChainMergeTask.setDuration(duration);
+
+		thread = new Thread(sideChainMergeTask);
+		thread.setDaemon(false);
+		thread.start();
+
+		conversionProgressBar.progressProperty().bind(sideChainMergeTask.progressProperty());
+		System.out.println();
+		System.out.println();
+		System.out.println("Showing");
+		System.out.println();
+		System.out.println();
+		//
+		// try {
+		// thread.join();
+		// } catch (InterruptedException e) {
+		// System.out.println("Interupted");
+		// e.printStackTrace();
+		// }
+
+		sideChainMergeTask.setOnSucceeded(event -> {
+			System.out.println("Succeeded");
+			conversionProgressBar.progressProperty().unbind();
+			conversionProgressBar.setProgress(0);
+
+			tempFinalAudioFile.delete();
+
+			startMedia(new Media("file:///" + sanitiseFileName(outputFile)));
+		});
+		sideChainMergeTask.setOnCancelled(event -> {
+			System.out.println("Cancelled.");
+			conversionProgressBar.progressProperty().unbind();
+			conversionProgressBar.setProgress(0);
+
+			tempFinalAudioFile.delete();
+		});
+		sideChainMergeTask.setOnFailed(event -> {
+			System.out.println("Failed");
+			conversionProgressBar.progressProperty().unbind();
+			conversionProgressBar.setProgress(0);
+
+			tempFinalAudioFile.delete();
+		});
+
+		// String ffmpegCommand = "ffmpeg -y -i " + mp4File.getAbsolutePath() +
+		// " ~/stripped.wav && ";
+		// ffmpegCommand += "sox -m -v0 ~/stripped.wav \"| sox " + mp3File + "
+		// -c 2 -p pad " + seconds
+		// + " \" ~/final.wav && ";
+		// ffmpegCommand += "ffmpeg -y -i " + mp4File.getAbsolutePath()
+		// + " -i ~/final.wav -filter_complex
+		// \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\"
+		// "
+		// + "-acodec aac -strict -2 -preset ultrafast " + outputFile + " && " +
+		// "rm ~/stripped.wav ~/final.wav";
+		//
+		// System.out.println("Command:\n" + ffmpegCommand);
+		//
+		// ProcessBuilder procBuilder = null;
+		//
+		// String os = System.getProperty("os.name").toLowerCase();
+		// if (os.contains("win")) {
+		// procBuilder = new ProcessBuilder("cmd", "/c", ffmpegCommand);
+		// } else {
+		// procBuilder = new ProcessBuilder("/bin/bash", "-c", ffmpegCommand);
+		// }
+		//
+		// Alert convertAlert = new Alert(AlertType.INFORMATION, "Merging audio
+		// file into video", ButtonType.OK);
+		// convertAlert.setWidth(400);
+		// convertAlert.setHeight(300);
+		// convertAlert.initModality(Modality.APPLICATION_MODAL);
+		// convertAlert.initOwner(Window.getPrimaryStage());
+		//
+		// convertAlert.show();
+		//
+		// procBuilder.redirectErrorStream(true);
+		// try {
+		// Process process = procBuilder.start();
+		//
+		// InputStream inputStream = process.getInputStream();
+		// OutputStream outputStream = process.getOutputStream();
+		//
+		// BufferedReader reader = new BufferedReader(new
+		// InputStreamReader(inputStream));
+		//
+		// String line = null;
+		//
+		// while ((line = reader.readLine()) != null) {
+		// System.out.println("Process: " + line);
+		// }
+		//
+		// } catch (Exception e) {
+		// System.out.println("Failed process");
+		// e.printStackTrace();
+		// }
+		//
+		// convertAlert.close();
+		//
+		// Alert convertedAlert = new Alert(AlertType.INFORMATION,
+		// "Video has been converted. Please open the saved location using the
+		// open video command to view.",
+		// ButtonType.OK);
+		// convertedAlert.setWidth(400);
+		// convertedAlert.setHeight(300);
+		// convertedAlert.showAndWait();
 	}
 
 	/**

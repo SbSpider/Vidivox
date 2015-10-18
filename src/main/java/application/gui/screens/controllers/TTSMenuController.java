@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import application.gui.Window;
+import framework.component.PrefFileChooser;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -22,7 +23,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
-import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class TTSMenuController implements Initializable {
@@ -83,7 +84,7 @@ public class TTSMenuController implements Initializable {
 
 		String textToConvert = UserTextField.getText();
 
-		FileChooser chooser = new FileChooser();
+		PrefFileChooser chooser = new PrefFileChooser();
 
 		// Used
 		// http://stackoverflow.com/questions/14256588/opening-a-javafx-filechooser-in-the-user-directory
@@ -102,9 +103,8 @@ public class TTSMenuController implements Initializable {
 		}
 
 		chooser.setTitle("Please select location to save text to speech output file to");
-		chooser.setInitialDirectory(userDirectory);
-		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Wav - wav", "*.wav"),
-				new FileChooser.ExtensionFilter("All Files", "*.*"));
+		chooser.setExtensionFilters(new ExtensionFilter("Wav - wav", "*.wav"),
+				new ExtensionFilter("All Files", "*.*"));
 
 		File saveFile = chooser.showSaveDialog(Window.getPrimaryStage());
 

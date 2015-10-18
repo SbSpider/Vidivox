@@ -1,4 +1,4 @@
-package framework.savefunction;
+package framework.savefunction.saveableobjects;
 
 import java.io.Serializable;
 

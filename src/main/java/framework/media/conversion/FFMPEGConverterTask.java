@@ -11,6 +11,7 @@ import javafx.util.Duration;
 
 public class FFMPEGConverterTask extends Task<Void> {
 
+	private static final String STRICT_2_PRESET_ULTRAFAST = " -strict -2 -preset ultrafast ";
 	/**
 	 * Command to perform via ffmpeg
 	 */
@@ -22,7 +23,7 @@ public class FFMPEGConverterTask extends Task<Void> {
 	 */
 	public FFMPEGConverterTask() {
 		// Defualt options.
-		command = "ffmpeg -y -strict -2 -preset ultrafast -codec aac ";
+		command = "ffmpeg -y ";
 	}
 
 	/**
@@ -55,9 +56,9 @@ public class FFMPEGConverterTask extends Task<Void> {
 	 */
 	public FFMPEGConverterTask(String inputAudioFilePath, String inputVideoFilePath, String outputFilePath) {
 		this();
-		command += "-i " + inputAudioFilePath + " -i " + inputVideoFilePath
+		command += "-i " + inputVideoFilePath + " -i " + inputAudioFilePath
 				+ " -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" "
-				+ outputFilePath;
+				+ " -acodec aac " + STRICT_2_PRESET_ULTRAFAST + outputFilePath;
 	}
 
 	/**
@@ -91,30 +92,37 @@ public class FFMPEGConverterTask extends Task<Void> {
 			while ((line = reader.readLine()) != null) {
 				System.out.println("Progress: " + line);
 
-				// Output is of type:Process: frame= 190 fps=189 q=22.0 size=
-				// 1585kB time=00:00:07.62 bitrate=1702.8kbits/s
+				// If duration has been set then parse for progress.
+				if (duration != null) {
 
-				// Regex matching pattern
-				Pattern timeFindingPattern = Pattern.compile("(?<=time=)[\\d:.]*");
+					// Output is of type:Process: frame= 190 fps=189 q=22.0
+					// size=
+					// 1585kB time=00:00:07.62 bitrate=1702.8kbits/s
 
-				Matcher matcher = timeFindingPattern.matcher(line);
+					// Regex matching pattern
+					Pattern timeFindingPattern = Pattern.compile("(?<=time=)[\\d:.]*");
 
-				if (!matcher.find()) {
-					continue;
+					Matcher matcher = timeFindingPattern.matcher(line);
+
+					if (!matcher.find()) {
+						continue;
+					}
+
+					String time = matcher.group();
+
+					System.out.println("time: " + time);
+
+					String[] split = time.split(":");
+					int hours = Integer.parseInt(split[0]);
+					int minute = Integer.parseInt(split[1]);
+					double seconds = Double.parseDouble(split[2]);
+
+					int milliseconds = (int) (seconds * 1000);
+					milliseconds += minute * 60 * 1000;
+					milliseconds += hours * 60 * 1000;
+
+					updateProgress(milliseconds, duration.toMillis());
 				}
-
-				String time = matcher.group();
-
-				String[] split = time.split(":");
-				int hours = Integer.parseInt(split[0]);
-				int minute = Integer.parseInt(split[1]);
-				double seconds = Double.parseDouble(split[2]);
-
-				int milliseconds = (int) (seconds * 1000);
-				milliseconds += minute * 60 * 1000;
-				milliseconds += hours * 60 * 1000;
-
-				updateProgress(milliseconds, duration.toMillis());
 			}
 
 		} catch (Exception e) {

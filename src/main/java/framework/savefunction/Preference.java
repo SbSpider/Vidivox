@@ -1,5 +1,7 @@
 package framework.savefunction;
 
+import framework.savefunction.saveableobjects.SaveableObject;
+
 /**
  * A preference. This will be used to hold string values.
  * 

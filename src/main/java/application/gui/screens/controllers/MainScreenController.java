@@ -2,47 +2,38 @@ package application.gui.screens.controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FilenameUtils;
 
 import application.gui.Window;
 import application.gui.screens.components.VideoPlayer;
+import framework.ScratchDir;
 import framework.component.PrefFileChooser;
 import framework.component.TreeViewDirectoryViewer;
 import framework.media.conversion.FFMPEGConverterTask;
-import framework.savefunction.JSONConverter;
 import framework.savefunction.SaveFileDO;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressBar;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.Dialog;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.input.KeyCombination.Modifier;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.Media;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Duration;
-import javafx.stage.Stage;
 
 /**
  * THe controller for the main screen.
@@ -81,6 +72,12 @@ public class MainScreenController implements Initializable {
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+
+		// Setup default scratch dir
+		File dir = new File(System.getProperty("user.home") + "/.Vidivox/scratch");
+		dir.mkdirs();
+		ScratchDir.setScratchDir(dir);
+
 		videoPlayer = new VideoPlayer();
 		dirTreeView = new TreeViewDirectoryViewer();
 
@@ -114,10 +111,6 @@ public class MainScreenController implements Initializable {
 		 * 
 		 */
 		bt.setOnAction(event -> {
-			// FFMPEGConverterTask task = new
-			// FFMPEGConverterTask("/home/spider/share/temp/asda.wav",
-			// "/home/spider/share/A4/bigbuckbunny206_2.mp4",
-			// "/home/spider/share/temp/sada.mp4");
 			FFMPEGConverterTask task = new FFMPEGConverterTask(
 					"ffmpeg -y -i /home/spider/share/temp/bigbuckbunny206_2.mp4 -i ~/final.wav -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" -acodec aac -strict -2 -preset ultrafast /home/spider/share/temp/final.mp4");
 			task.setDuration(Duration.minutes(1));
@@ -128,12 +121,11 @@ public class MainScreenController implements Initializable {
 
 			ProgressBar bar = new ProgressBar();
 			bar.progressProperty().bind(task.progressProperty());
-			
 
-			task.setOnSucceeded(event2 ->{
+			task.setOnSucceeded(event2 -> {
 				bar.setVisible(false);
 			});
-			
+
 			mainScreen_Root.setRight(bar);
 		});
 	}
@@ -280,6 +272,8 @@ public class MainScreenController implements Initializable {
 
 		initTreeview(saveFile);
 
+		// Setup scratch location.
+		ScratchDir.setScratchDir(saveFile.getParentFile());
 	}
 
 	private void initTreeview(File saveFile) throws IOException {
