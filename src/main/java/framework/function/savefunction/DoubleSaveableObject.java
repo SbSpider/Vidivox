@@ -1,6 +1,6 @@
 package framework.function.savefunction;
 
-public class DoubleSaveableObject extends SaveableObject {
+public class DoubleSaveableObject extends SaveableObject  {
 
 	double value;
 

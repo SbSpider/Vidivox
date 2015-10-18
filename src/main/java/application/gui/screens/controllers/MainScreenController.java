@@ -1,7 +1,11 @@
 package application.gui.screens.controllers;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -104,23 +108,36 @@ public class MainScreenController implements Initializable {
 
 		File saveFile = chooser.showSaveDialog(Window.getPrimaryStage());
 
-		String jsonSaveData = JSONConverter.convertToJson(videoPlayer.generateSaveFile());
+		FileOutputStream fs = new FileOutputStream(saveFile);
+		ObjectOutputStream oos = new ObjectOutputStream(fs);
+		oos.writeObject(videoPlayer.generateSaveFile());
 
-		Files.write(Paths.get(saveFile.toURI()), jsonSaveData.getBytes());
+		oos.close();
+		fs.close();
+
+		// String jsonSaveData =
+		// JSONConverter.convertToJson(videoPlayer.generateSaveFile());
+
+		// Files.write(Paths.get(saveFile.toURI()), jsonSaveData.getBytes());
 	}
 
 	@FXML
-	public void onOpenProject(ActionEvent event) throws IOException {
+	public void onOpenProject(ActionEvent event) throws IOException, ClassNotFoundException {
 		PrefFileChooser chooser = new PrefFileChooser();
 		chooser.setExtensionFilters(new ExtensionFilter("Vidivox Project File", "*.vvoxproj"));
 
 		File saveFile = chooser.showOpenDialog(Window.getPrimaryStage());
 
-		String jsonSaveData = String.join("\n", Files.readAllLines(Paths.get(saveFile.toURI())));
+		// String jsonSaveData = String.join("\n",
+		// Files.readAllLines(Paths.get(saveFile.toURI())));
 
-		System.out.println(jsonSaveData);
-		SaveFileDO saveFileDO = JSONConverter.convertToDO(jsonSaveData);
+		// System.out.println(jsonSaveData);
+		// SaveFileDO saveFileDO = JSONConverter.convertToDO(jsonSaveData);
 
+		FileInputStream fs = new FileInputStream(saveFile);
+		ObjectInputStream ois = new ObjectInputStream(fs);
+		SaveFileDO saveFileDO = (SaveFileDO) ois.readObject();
+		
 		videoPlayer.useSaveFile(saveFileDO);
 	}
 
