@@ -340,8 +340,7 @@ public class VideoPlayer extends BorderPane {
 			pauseVideo();
 
 			PrefFileChooser chooser = new PrefFileChooser();
-			chooser.setExtensionFilters(new ExtensionFilter("Wav", "*.wav"),
-					new ExtensionFilter("All Files", "*"));
+			chooser.setExtensionFilters(new ExtensionFilter("Wav", "*.wav"), new ExtensionFilter("All Files", "*"));
 
 			File mp3File = chooser.showOpenDialog(Window.getPrimaryStage());
 
@@ -616,26 +615,11 @@ public class VideoPlayer extends BorderPane {
 			}
 		});
 
-		mp.setOnPlaying(new Runnable() {
-			public void run() {
-			}
-		});
-
-		mp.setOnPaused(new Runnable() {
-			public void run() {
-			}
-		});
-
 		mp.setOnReady(new Runnable() {
 			public void run() {
 				duration = mp.getMedia().getDuration();
 				updateValues();
 
-			}
-		});
-
-		mp.setOnEndOfMedia(new Runnable() {
-			public void run() {
 			}
 		});
 

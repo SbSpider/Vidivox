@@ -82,7 +82,7 @@ public class MainScreenController implements Initializable {
 	@FXML
 	public void onOpenVideo(ActionEvent event) {
 		PrefFileChooser chooser = new PrefFileChooser();
-		chooser.setExtensionFilters(new ExtensionFilter("Mp3's", "*.mp4"));
+		chooser.setExtensionFilters(new ExtensionFilter("Mp4's", "*.mp4"));
 
 		File videoFile = chooser.showOpenDialog(Window.getPrimaryStage());
 
