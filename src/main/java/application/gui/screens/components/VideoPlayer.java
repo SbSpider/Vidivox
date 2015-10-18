@@ -11,6 +11,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import application.gui.Window;
 import application.gui.screens.controllers.TTSMenuController;
+import framework.component.PrefFileChooser;
 import framework.function.savefunction.DoubleSaveableObject;
 import framework.function.savefunction.SaveFileDO;
 import framework.function.savefunction.SaveableObject;
@@ -35,7 +36,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
@@ -47,7 +47,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.text.Text;
-import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -259,7 +259,7 @@ public class VideoPlayer extends BorderPane {
 
 		// this.getStylesheets().add("/css/VideoPlayer_Base.css");
 		this.setStyle("-fx-background-color : white");
-		this.setMaxSize(800, 800);
+		this.setMaxSize(600, 600);
 
 		// http://stackoverflow.com/questions/14157161/hybrid-of-slider-with-progress-bar-javafx
 		// used for progress bar / slider hybrid
@@ -339,10 +339,9 @@ public class VideoPlayer extends BorderPane {
 			// Pause the video so that the location is preserved.
 			pauseVideo();
 
-			FileChooser chooser = new FileChooser();
-			chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-			chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Wav", "*.wav"),
-					new FileChooser.ExtensionFilter("All Files", "*"));
+			PrefFileChooser chooser = new PrefFileChooser();
+			chooser.setExtensionFilters(new ExtensionFilter("Wav", "*.wav"),
+					new ExtensionFilter("All Files", "*"));
 
 			File mp3File = chooser.showOpenDialog(Window.getPrimaryStage());
 
@@ -460,11 +459,10 @@ public class VideoPlayer extends BorderPane {
 	}
 
 	private File getOutputSaveFile() {
-		FileChooser chooser = new FileChooser();
-		chooser.setInitialDirectory(new File(System.getProperty("user.home")));
+		PrefFileChooser chooser = new PrefFileChooser();
 
 		chooser.setTitle("Please select location to save output to");
-		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Mp4", "*.mp4"));
+		chooser.setExtensionFilters(new ExtensionFilter("Mp4", "*.mp4"));
 		chooser.setInitialFileName("FinalOutput");
 
 		File saveFile = chooser.showSaveDialog(Window.getPrimaryStage());

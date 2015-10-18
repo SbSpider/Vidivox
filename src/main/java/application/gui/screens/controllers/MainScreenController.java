@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 
 import application.gui.Window;
 import application.gui.screens.components.VideoPlayer;
+import framework.component.PrefFileChooser;
 import framework.function.savefunction.JSONConverter;
 import framework.function.savefunction.SaveFileDO;
 import javafx.event.ActionEvent;
@@ -21,7 +22,7 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.Media;
-import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
  * THe controller for the main screen.
@@ -76,9 +77,8 @@ public class MainScreenController implements Initializable {
 
 	@FXML
 	public void onOpenVideo(ActionEvent event) {
-		FileChooser chooser = new FileChooser();
-		chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Mp3's", "*.mp4"));
+		PrefFileChooser chooser = new PrefFileChooser();
+		chooser.setExtensionFilters(new ExtensionFilter("Mp3's", "*.mp4"));
 
 		File videoFile = chooser.showOpenDialog(Window.getPrimaryStage());
 
@@ -99,9 +99,8 @@ public class MainScreenController implements Initializable {
 
 	@FXML
 	public void onSaveProject(ActionEvent event) throws IOException {
-		FileChooser chooser = new FileChooser();
-		chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Vidivox Project File", "*.vvoxproj"));
+		PrefFileChooser chooser = new PrefFileChooser();
+		chooser.setExtensionFilters(new ExtensionFilter("Vidivox Project File", "*.vvoxproj"));
 
 		File saveFile = chooser.showSaveDialog(Window.getPrimaryStage());
 
@@ -112,9 +111,8 @@ public class MainScreenController implements Initializable {
 
 	@FXML
 	public void onOpenProject(ActionEvent event) throws IOException {
-		FileChooser chooser = new FileChooser();
-		chooser.setInitialDirectory(new File(System.getProperty("user.home")));
-		chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Vidivox Project File", "*.vvoxproj"));
+		PrefFileChooser chooser = new PrefFileChooser();
+		chooser.setExtensionFilters(new ExtensionFilter("Vidivox Project File", "*.vvoxproj"));
 
 		File saveFile = chooser.showOpenDialog(Window.getPrimaryStage());
 
