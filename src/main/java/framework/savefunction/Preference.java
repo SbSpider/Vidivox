@@ -1,4 +1,4 @@
-package framework.function.savefunction;
+package framework.savefunction;
 
 /**
  * A preference. This will be used to hold string values.

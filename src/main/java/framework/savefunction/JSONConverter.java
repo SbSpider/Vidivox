@@ -1,4 +1,4 @@
-package framework.function.savefunction;
+package framework.savefunction;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

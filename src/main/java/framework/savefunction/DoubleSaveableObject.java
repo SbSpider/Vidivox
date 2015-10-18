@@ -1,4 +1,4 @@
-package framework.function.savefunction;
+package framework.savefunction;
 
 public class DoubleSaveableObject extends SaveableObject  {
 

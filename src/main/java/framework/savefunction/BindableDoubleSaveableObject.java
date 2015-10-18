@@ -1,4 +1,4 @@
-package framework.function.savefunction;
+package framework.savefunction;
 
 import javafx.beans.property.DoubleProperty;
 
