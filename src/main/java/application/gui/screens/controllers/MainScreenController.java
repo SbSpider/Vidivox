@@ -27,6 +27,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyCombination.Modifier;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.Media;
 import javafx.stage.DirectoryChooser;
@@ -74,9 +75,9 @@ public class MainScreenController implements Initializable {
 
 		// Add acellerators
 		openVideoMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
-		saveProjectMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
-		
-		// Until saveProejct is enabled, acceleator for saveproject as is Ctrl + s
+
+		// Until saveProejct is enabled, acceleator for saveproject as is Ctrl +
+		// s
 		saveProjectAsMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 
 		// Deactivate normal save until a project exists
@@ -156,6 +157,8 @@ public class MainScreenController implements Initializable {
 
 		oos.close();
 		fs.close();
+
+		System.out.println("Saved to file");
 	}
 
 	@FXML
@@ -209,10 +212,13 @@ public class MainScreenController implements Initializable {
 
 		saveProjectToFile(saveFile, projectFile);
 
-		// Enable the save project button
-		saveProjectMenuItem.setDisable(false);
 		// remove accelerator for save project as
 		saveProjectAsMenuItem.setAccelerator(null);
+
+		// Enable the save project button
+		saveProjectMenuItem.setDisable(false);
+		saveProjectMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
+
 	}
 
 }

@@ -8,41 +8,31 @@
 <?import java.lang.String?>
 <?import javafx.scene.control.SeparatorMenuItem?>
 
-<BorderPane fx:id="mainScreen_Root" prefHeight="1000"
-	prefWidth="1000" styleClass="root" xmlns="http://javafx.com/javafx/8.0.60"
-	xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.gui.screens.controllers.MainScreenController">
+<BorderPane fx:id="mainScreen_Root" prefHeight="1000" prefWidth="1000" styleClass="root" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.gui.screens.controllers.MainScreenController">
 	<center>
 		<Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
 	</center>
 	<top>
 		<GridPane BorderPane.alignment="CENTER">
 			<columnConstraints>
-				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"
-					prefWidth="100.0" />
+				<ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
 			</columnConstraints>
 			<rowConstraints>
-				<RowConstraints minHeight="10.0" prefHeight="30.0"
-					vgrow="SOMETIMES" />
-				<RowConstraints minHeight="10.0" prefHeight="30.0"
-					vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+				<RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
 			</rowConstraints>
 			<children>
 				<MenuBar fx:id="menuBar" GridPane.halignment="RIGHT">
 					<menus>
 						<Menu mnemonicParsing="false" text="File">
 							<items>
-								<MenuItem fx:id="openVideoMenuItem" mnemonicParsing="false"
-									onAction="#onOpenVideo" text="Open Video" />
+								<MenuItem fx:id="openVideoMenuItem" mnemonicParsing="false" onAction="#onOpenVideo" text="Open Video" />
 								<SeparatorMenuItem />
-								<MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false"
-									onAction="#onSaveProject" text="Save Project" />
-								<MenuItem fx:id="saveProjectAsMenuItem" mnemonicParsing="false"
-									onAction="#onSaveProjectAsAction" text="Save Project AS" />
-								<MenuItem fx:id="openProjectMenuItem" mnemonicParsing="false"
-									onAction="#onOpenProject" text="Open Project" />
+								<MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false" onAction="#onSaveProject" text="Save Project" />
+								<MenuItem fx:id="saveProjectAsMenuItem" mnemonicParsing="false" onAction="#onSaveProjectAsAction" text="Save Project As" />
+								<MenuItem fx:id="openProjectMenuItem" mnemonicParsing="false" onAction="#onOpenProject" text="Open Project" />
 								<SeparatorMenuItem mnemonicParsing="false" />
-								<MenuItem fx:id="closeWindowMenuItem" mnemonicParsing="false"
-									onAction="#closeButton" text="Close" />
+								<MenuItem fx:id="closeWindowMenuItem" mnemonicParsing="false" onAction="#closeButton" text="Close" />
 							</items>
 						</Menu>
 						<Menu mnemonicParsing="false" text="Edit">
