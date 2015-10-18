@@ -109,6 +109,7 @@ public class MainScreenController implements Initializable {
 		File saveFile = chooser.showSaveDialog(Window.getPrimaryStage());
 
 		SaveFileDO saveFileDO = new SaveFileDO();
+		saveFileDO.setSaveFilename(saveFile.getAbsolutePath());
 
 		FileOutputStream fs = new FileOutputStream(saveFile);
 		ObjectOutputStream oos = new ObjectOutputStream(fs);
