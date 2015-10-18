@@ -108,9 +108,11 @@ public class MainScreenController implements Initializable {
 
 		File saveFile = chooser.showSaveDialog(Window.getPrimaryStage());
 
+		SaveFileDO saveFileDO = new SaveFileDO();
+
 		FileOutputStream fs = new FileOutputStream(saveFile);
 		ObjectOutputStream oos = new ObjectOutputStream(fs);
-		oos.writeObject(videoPlayer.generateSaveFile());
+		oos.writeObject(videoPlayer.generateSaveObjects(saveFileDO));
 
 		oos.close();
 		fs.close();
@@ -137,7 +139,7 @@ public class MainScreenController implements Initializable {
 		FileInputStream fs = new FileInputStream(saveFile);
 		ObjectInputStream ois = new ObjectInputStream(fs);
 		SaveFileDO saveFileDO = (SaveFileDO) ois.readObject();
-		
+
 		videoPlayer.useSaveFile(saveFileDO);
 	}
 

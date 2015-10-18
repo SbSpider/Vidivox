@@ -729,13 +729,21 @@ public class VideoPlayer extends BorderPane {
 	 * 
 	 * @return
 	 */
-	public SaveFileDO generateSaveFile() {
-		SaveFileDO saveFile = new SaveFileDO();
+	public SaveFileDO generateSaveObjects(SaveFileDO saveFile) {
 
+		if (saveFile == null) {
+			saveFile = new SaveFileDO();
+		}
+		
 		HashMap<String, SaveableObject> saveableObjects = saveFile.getSaveableObjects();
 
 		saveableObjects.put("progressSlider", new DoubleSaveableObject(progressSlider.getValue()));
 
 		return saveFile;
 	}
+
+	public SaveFileDO generateSaveObjects() {
+		return generateSaveObjects(null);
+	}
+
 }
