@@ -2,6 +2,7 @@ package application.gui.screens.controllers;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,13 +20,16 @@ import framework.savefunction.SaveFileDO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.media.Media;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 
 /**
@@ -53,6 +57,13 @@ public class MainScreenController implements Initializable {
 	MenuItem ttsMenuItem;
 
 	/**
+	 * Application wide save file.
+	 */
+	SaveFileDO projectFile;
+	@FXML
+	MenuItem saveProjectAsMenuItem;
+
+	/**
 	 * Initializes the screen.
 	 */
 	@Override
@@ -64,6 +75,12 @@ public class MainScreenController implements Initializable {
 		// Add acellerators
 		openVideoMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
 		saveProjectMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
+		
+		// Until saveProejct is enabled, acceleator for saveproject as is Ctrl + s
+		saveProjectAsMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
+
+		// Deactivate normal save until a project exists
+		saveProjectMenuItem.setDisable(true);
 
 	}
 
@@ -101,33 +118,50 @@ public class MainScreenController implements Initializable {
 		return absolutePath;
 	}
 
+	/**
+	 * Saves the project, assuming that the project already has a save location.
+	 * 
+	 * @param event
+	 * @throws IOException
+	 */
 	@FXML
 	public void onSaveProject(ActionEvent event) throws IOException {
-		PrefFileChooser chooser = new PrefFileChooser();
-		chooser.setExtensionFilters(new ExtensionFilter("Vidivox Project File", "*.vvoxproj"));
 
-		File saveFile = chooser.showSaveDialog(Window.getPrimaryStage());
+		if (projectFile == null) {
+			Alert warning = new Alert(AlertType.ERROR, "Please use save as first.");
+			warning.showAndWait();
+			return;
+		}
+
+		File saveFile = new File(projectFile.getSaveFilename());
 
 		SaveFileDO saveFileDO = new SaveFileDO();
 		saveFileDO.setSaveFilename(saveFile.getAbsolutePath());
 
+		saveFileDO = getSaveObjects(saveFileDO);
+
+		saveProjectToFile(saveFile, saveFileDO);
+	}
+
+	private SaveFileDO getSaveObjects(SaveFileDO saveFileDO) {
+		saveFileDO = videoPlayer.generateSaveObjects(saveFileDO);
+		return saveFileDO;
+	}
+
+	private void saveProjectToFile(File saveFile, SaveFileDO saveFileDO) throws IOException {
 		FileOutputStream fs = new FileOutputStream(saveFile);
 		ObjectOutputStream oos = new ObjectOutputStream(fs);
-		oos.writeObject(videoPlayer.generateSaveObjects(saveFileDO));
+
+		oos.writeObject(saveFileDO);
 
 		oos.close();
 		fs.close();
-
-		// String jsonSaveData =
-		// JSONConverter.convertToJson(videoPlayer.generateSaveFile());
-
-		// Files.write(Paths.get(saveFile.toURI()), jsonSaveData.getBytes());
 	}
 
 	@FXML
 	public void onOpenProject(ActionEvent event) throws IOException, ClassNotFoundException {
 		PrefFileChooser chooser = new PrefFileChooser();
-		chooser.setExtensionFilters(new ExtensionFilter("Vidivox Project File", "*.vvoxproj"));
+		chooser.setExtensionFilters(new ExtensionFilter("Vidivox Project", "*.vvoxproj"));
 
 		File saveFile = chooser.showOpenDialog(Window.getPrimaryStage());
 
@@ -142,6 +176,43 @@ public class MainScreenController implements Initializable {
 		SaveFileDO saveFileDO = (SaveFileDO) ois.readObject();
 
 		videoPlayer.useSaveFile(saveFileDO);
+	}
+
+	/**
+	 * When saving, you want the dir.
+	 * 
+	 * @param event
+	 * @throws IOException
+	 */
+	@FXML
+	public void onSaveProjectAsAction(ActionEvent event) throws IOException {
+		// PrefFileChooser chooser = new PrefFileChooser();
+		// chooser.setExtensionFilters(new ExtensionFilter("Vidivox Project
+		// File", "*.vvoxproj"));
+		//
+		// File saveFile = chooser.showSaveDialog(Window.getPrimaryStage());
+		PrefFileChooser projectDirectoryChooser = new PrefFileChooser();
+		projectDirectoryChooser.setExtensionFilters(new ExtensionFilter("Vidivox Project", "*.vvoxproj"));
+
+		projectDirectoryChooser
+				.setTitle("Please select project save location. Directory of save file also used for temp files.");
+		File saveFile = projectDirectoryChooser.showSaveDialog(Window.getPrimaryStage());
+
+		if (saveFile == null) {
+			return;
+		}
+
+		projectFile = new SaveFileDO();
+		// Sets the save file location
+		projectFile.setSaveFilename(saveFile.getAbsolutePath());
+		projectFile = getSaveObjects(projectFile);
+
+		saveProjectToFile(saveFile, projectFile);
+
+		// Enable the save project button
+		saveProjectMenuItem.setDisable(false);
+		// remove accelerator for save project as
+		saveProjectAsMenuItem.setAccelerator(null);
 	}
 
 }

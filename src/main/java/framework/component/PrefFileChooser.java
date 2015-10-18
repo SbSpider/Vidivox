@@ -16,6 +16,7 @@ import javafx.stage.Window;
  */
 public class PrefFileChooser {
 
+	private static final String VIDIVOX = "Vidivox";
 	private static final String LAST_SAVE_LOCATION = "LastSaveLocation";
 	/**
 	 * Internal chooser that is used.
@@ -25,10 +26,20 @@ public class PrefFileChooser {
 	public PrefFileChooser() {
 		chooser = new FileChooser();
 
-		Preferences pref = Preferences.userRoot().node("Vidivox");
+		Preferences pref = Preferences.userRoot().node(VIDIVOX);
 		String path = pref.get(LAST_SAVE_LOCATION, System.getProperty("user.home"));
 
 		chooser.setInitialDirectory(new File(path));
+	}
+
+	/**
+	 * helper method that will just grab the last save location.
+	 */
+	public static File getLastSaveLocation() {
+		Preferences pref = Preferences.userRoot().node(VIDIVOX);
+
+		return new File(pref.get(LAST_SAVE_LOCATION, System.getProperty("user.home")));
+
 	}
 
 	/**
@@ -88,11 +99,20 @@ public class PrefFileChooser {
 	}
 
 	/**
+	 * Overrides the lst initial directory.
+	 * 
+	 * @param dir
+	 */
+	public void setInitialDirectory(File dir) {
+		chooser.setInitialDirectory(dir);
+	}
+
+	/**
 	 * Saves the location to preference api.
 	 */
 	private void saveToPrefAPI(File file) {
 
-		Preferences pref = Preferences.userRoot().node("Vidivox");
+		Preferences pref = Preferences.userRoot().node(VIDIVOX);
 
 		String path = null;
 

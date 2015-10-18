@@ -6,6 +6,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import java.lang.String?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 
 <BorderPane fx:id="mainScreen_Root" prefHeight="1000"
 	prefWidth="1000" styleClass="root" xmlns="http://javafx.com/javafx/8.0.60"
@@ -32,10 +33,14 @@
 							<items>
 								<MenuItem fx:id="openVideoMenuItem" mnemonicParsing="false"
 									onAction="#onOpenVideo" text="Open Video" />
+								<SeparatorMenuItem />
 								<MenuItem fx:id="saveProjectMenuItem" mnemonicParsing="false"
 									onAction="#onSaveProject" text="Save Project" />
+								<MenuItem fx:id="saveProjectAsMenuItem" mnemonicParsing="false"
+									onAction="#onSaveProjectAsAction" text="Save Project AS" />
 								<MenuItem fx:id="openProjectMenuItem" mnemonicParsing="false"
 									onAction="#onOpenProject" text="Open Project" />
+								<SeparatorMenuItem mnemonicParsing="false" />
 								<MenuItem fx:id="closeWindowMenuItem" mnemonicParsing="false"
 									onAction="#closeButton" text="Close" />
 							</items>
