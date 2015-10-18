@@ -15,6 +15,7 @@ import framework.component.PrefFileChooser;
 import framework.savefunction.DoubleSaveableObject;
 import framework.savefunction.SaveFileDO;
 import framework.savefunction.SaveableObject;
+import framework.savefunction.StringSaveableObject;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -436,7 +437,7 @@ public class VideoPlayer extends BorderPane {
 				String outputName = saveFile.getAbsolutePath();
 				mergeWithAudioAtLocation(ttsFilename, outputName);
 
-				startMedia(new Media("file:///" + saveFile.getAbsolutePath()));
+				startMedia(new Media("file:///" + sanitiseFileName(saveFile.getAbsolutePath())));
 			} else {
 				if (playPauseButton.getText().equals("||")) {
 					playPauseButton.fire();
@@ -482,9 +483,7 @@ public class VideoPlayer extends BorderPane {
 		// System.out.println("No mp4 file chosen");
 		// return;
 		// }
-		String mp4FilePath = mediaView.getMediaPlayer().getMedia().getSource();
-		mp4FilePath = mp4FilePath.substring("file:///".length());
-		File mp4File = new File(mp4FilePath);
+		File mp4File = getMp4FileFromCurrentlyPlayingMedia();
 
 		// http://stackoverflow.com/questions/9027317/how-to-convert-milliseconds-to-hhmmss-format
 		// was used for time conversion.
@@ -546,6 +545,24 @@ public class VideoPlayer extends BorderPane {
 		convertedAlert.setWidth(400);
 		convertedAlert.setHeight(300);
 		convertedAlert.showAndWait();
+	}
+
+	/**
+	 * Will get the mp4 file from the currently playing media, stripping of the
+	 * file:/// specifier. Note, this requires a video to alreadu be running.
+	 * 
+	 * @return
+	 */
+	private File getMp4FileFromCurrentlyPlayingMedia() {
+		MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+
+		if (mediaPlayer == null || mediaPlayer.getMedia() == null) {
+			return null;
+		}
+		String mp4FilePath = mediaPlayer.getMedia().getSource();
+		mp4FilePath = mp4FilePath.substring("file:///".length());
+		File mp4File = new File(mp4FilePath);
+		return mp4File;
 	}
 
 	private void playVideo() {
@@ -617,10 +634,10 @@ public class VideoPlayer extends BorderPane {
 
 		mp.setOnReady(new Runnable() {
 			public void run() {
-				duration = mp.getMedia().getDuration();
-				updateValues();
+				mediaOnReady(mp);
 
 			}
+
 		});
 
 		// Value changing property for the sliding action.
@@ -674,6 +691,11 @@ public class VideoPlayer extends BorderPane {
 		}
 	}
 
+	private void mediaOnReady(MediaPlayer mp) {
+		duration = mp.getMedia().getDuration();
+		updateValues();
+	}
+
 	private static String formatTime(Duration elapsed, Duration duration) {
 		int intElapsed = (int) Math.floor(elapsed.toSeconds());
 		int elapsedHours = intElapsed / (60 * 60);
@@ -720,8 +742,38 @@ public class VideoPlayer extends BorderPane {
 	public void useSaveFile(SaveFileDO saveFile) {
 		HashMap<String, SaveableObject> saveableObjects = saveFile.getSaveableObjects();
 
-		progressSlider.setValue((double) saveableObjects.get("progressSlider").getValue());
+		// Will load the video specified in the save file as well, if not null
+		if (saveableObjects.get("videoMediaSource") != null) {
+			StringSaveableObject stringSave = (StringSaveableObject) saveableObjects.get("videoMediaSource");
+			String path = (String) stringSave.getValue();
+			File mediaFile = new File(path);
+			startMedia(new Media("file:///" + sanitiseFileName(mediaFile.getAbsolutePath())));
 
+			// Once the media is prepped, set the values.
+			mediaView.getMediaPlayer().setOnReady(() -> {
+				mediaOnReady(mediaView.getMediaPlayer());
+				setValuesFromFile(saveFile);
+				pauseVideo();
+			});
+
+		} else {
+			// If there is no pre set media, then just set values
+			setValuesFromFile(saveFile);
+		}
+
+	}
+
+	private void setValuesFromFile(SaveFileDO saveFile) {
+
+		HashMap<String, SaveableObject> saveableObjects = saveFile.getSaveableObjects();
+
+		progressSlider.setValue((double) saveableObjects.get("progressSlider").getValue());
+	}
+
+	private String sanitiseFileName(String absolutePath) {
+		absolutePath = absolutePath.replace("\\", "/");
+		absolutePath = absolutePath.replace(" ", "%20");
+		return absolutePath;
 	}
 
 	/**
@@ -734,10 +786,12 @@ public class VideoPlayer extends BorderPane {
 		if (saveFile == null) {
 			saveFile = new SaveFileDO();
 		}
-		
+
 		HashMap<String, SaveableObject> saveableObjects = saveFile.getSaveableObjects();
 
 		saveableObjects.put("progressSlider", new DoubleSaveableObject(progressSlider.getValue()));
+		saveableObjects.put("videoMediaSource",
+				new StringSaveableObject(getMp4FileFromCurrentlyPlayingMedia().getAbsolutePath()));
 
 		return saveFile;
 	}
