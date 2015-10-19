@@ -14,26 +14,7 @@ import javafx.scene.layout.BorderPane;
 
 public class ClipTrack extends BorderPane {
 
-	private ProgressBar trackPositionBar;
-
 	public ClipTrack() {
-		trackPositionBar = new ProgressBar();
-		trackPositionBar.setProgress(0);
-
-		BackgroundImage image = null;
-		
-		try {
-		InputStream resourceAsStream = getClass().getResourceAsStream("waveform.png");
-		image = new BackgroundImage(new Image(resourceAsStream), BackgroundRepeat.NO_REPEAT,
-				BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, null);
-		} catch (Exception e){
-			System.out.println("Failed to find file");
-			e.printStackTrace();
-		}
-
-		trackPositionBar.setBackground(new Background(image));
-
-		setCenter(trackPositionBar);
 	}
 
 }
