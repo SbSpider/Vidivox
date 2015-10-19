@@ -83,6 +83,9 @@ public class MainScreenController implements Initializable {
 
 		// Setup default scratch dir
 		File dir = new File(System.getProperty("user.home") + "/.Vidivox/scratch");
+		// Clcear existing data in the node, so we don't persist last location.
+		dir.delete();
+		// Make the node.
 		dir.mkdirs();
 		ScratchDir.setScratchDir(dir);
 
@@ -121,10 +124,9 @@ public class MainScreenController implements Initializable {
 		centreBox.setAlignment(Pos.CENTER);
 
 		mainScreen_Root.setCenter(centreBox);
-		
-		
+
 		trackHolder = new TrackHolder();
-		
+
 		mainScreen_Root.setBottom(trackHolder);
 
 	}
@@ -165,7 +167,7 @@ public class MainScreenController implements Initializable {
 
 			clipTrack.setMaxWidth(videoPlayer.getMaxWidth());
 			clipTrack.setPrefWidth(videoPlayer.getPrefWidth());
-			
+
 			// Run onready
 			onReady.run();
 		});
