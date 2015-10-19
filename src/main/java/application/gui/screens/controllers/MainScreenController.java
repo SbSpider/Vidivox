@@ -168,6 +168,8 @@ public class MainScreenController implements Initializable {
 			clipTrack.setMaxWidth(videoPlayer.getMaxWidth());
 			clipTrack.setPrefWidth(videoPlayer.getPrefWidth());
 
+			trackHolder.setVideoSource(videoPlayer);
+
 			// Run onready
 			onReady.run();
 		});
