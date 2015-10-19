@@ -1,10 +1,6 @@
 package application.gui.screens.components;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.HashMap;
 
 import org.apache.commons.io.FilenameUtils;
@@ -24,13 +20,17 @@ import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -40,6 +40,8 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TitledPane;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.FlowPane;
@@ -47,13 +49,13 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
-import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -456,17 +458,72 @@ public class VideoPlayer extends BorderPane {
 			}
 		});
 
+		VBox titleBox = new VBox();
+
+		// Used below link
+		// https://docs.oracle.com/javafx/2/events/DraggablePanelsExample.java.htm
+
+		TitledPane titlePane = new TitledPane();
+
 		titleText = new Text();
 		titleText.setId("titleText");
 		titleText.setText("Please select a video to begin");
 
-		setTop(titleText);
+		titleBox.getChildren().add(titlePane);
+		titleBox.getChildren().add(titleText);
+
+		// Dragability setup:
+
+		final BooleanProperty dragModeActiveProperty = new SimpleBooleanProperty(this, "dragModeActive", true);
+		final DragContext dragContext = new DragContext();
+
+		titlePane.addEventFilter(MouseEvent.ANY, new EventHandler<MouseEvent>() {
+			public void handle(final MouseEvent mouseEvent) {
+				if (dragModeActiveProperty.get()) {
+					// disable mouse events for all children
+					mouseEvent.consume();
+				}
+			}
+		});
+
+		titlePane.addEventFilter(MouseEvent.MOUSE_PRESSED, new EventHandler<MouseEvent>() {
+			public void handle(final MouseEvent mouseEvent) {
+				if (dragModeActiveProperty.get()) {
+					// remember initial mouse cursor coordinates
+					// and node position
+					dragContext.mouseAnchorX = mouseEvent.getX();
+					dragContext.mouseAnchorY = mouseEvent.getY();
+					dragContext.initialTranslateX = getTranslateX();
+					dragContext.initialTranslateY = getTranslateY();
+				}
+			}
+		});
+
+		titlePane.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
+			public void handle(final MouseEvent mouseEvent) {
+				if (dragModeActiveProperty.get()) {
+					// shift node from its initial position by delta
+					// calculated from mouse cursor movement
+					setTranslateX(dragContext.initialTranslateX + mouseEvent.getX() - dragContext.mouseAnchorX);
+					setTranslateY(dragContext.initialTranslateY + mouseEvent.getY() - dragContext.mouseAnchorY);
+				}
+			}
+		});
+
+		setTop(titleBox);
 		setCenter(mediaView);
 		setBottom(bottomGridPane);
 
 		// Set the top to be centred.
 		setAlignment(getTop(), Pos.CENTER);
 
+	}
+
+	private static final class DragContext {
+		public double mouseAnchorX;
+		public double mouseAnchorY;
+		public double initialTranslateX;
+		public double initialTranslateY;
 	}
 
 	private File getOutputSaveFile() {
