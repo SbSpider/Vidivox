@@ -18,6 +18,7 @@ import application.gui.screens.components.VideoPlayer;
 import framework.ScratchDir;
 import framework.component.ClipTrack;
 import framework.component.PrefFileChooser;
+import framework.component.TrackHolder;
 import framework.component.TreeViewDirectoryViewer;
 import framework.media.conversion.FFMPEGConverterTask;
 import framework.savefunction.SaveFileDO;
@@ -72,6 +73,7 @@ public class MainScreenController implements Initializable {
 	MenuItem saveProjectAsMenuItem;
 	TreeViewDirectoryViewer dirTreeView;
 	private VBox centreBox;
+	private TrackHolder trackHolder;
 
 	/**
 	 * Initializes the screen.
@@ -119,6 +121,11 @@ public class MainScreenController implements Initializable {
 		centreBox.setAlignment(Pos.CENTER);
 
 		mainScreen_Root.setCenter(centreBox);
+		
+		
+		trackHolder = new TrackHolder();
+		
+		mainScreen_Root.setBottom(trackHolder);
 
 	}
 
