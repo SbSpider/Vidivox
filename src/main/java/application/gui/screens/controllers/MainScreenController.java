@@ -32,6 +32,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Duration;
@@ -93,13 +94,24 @@ public class MainScreenController implements Initializable {
 		saveProjectMenuItem.setDisable(true);
 
 		// Set locations
-		mainScreen_Root.setCenter(videoPlayer);
+//		mainScreen_Root.setCenter(videoPlayer);
 		mainScreen_Root.setLeft(dirTreeView);
 
 		
 		ClipTrack clipTrack = new ClipTrack();
+		clipTrack.setMaxHeight(10);
+		clipTrack.setPrefHeight(10);
 		
-		mainScreen_Root.setBottom(clipTrack);
+		clipTrack.setMaxWidth(videoPlayer.getMaxWidth());
+		clipTrack.setPrefWidth(videoPlayer.getPrefWidth());
+//		clipTrack.setwid
+		
+		VBox centreBox = new VBox();
+		centreBox.getChildren().add(videoPlayer);
+		centreBox.getChildren().add(clipTrack);
+		
+		mainScreen_Root.setCenter(centreBox);
+
 	}
 
 	@FXML
