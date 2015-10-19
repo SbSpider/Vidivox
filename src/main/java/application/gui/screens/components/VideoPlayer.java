@@ -463,6 +463,10 @@ public class VideoPlayer extends BorderPane {
 		// Used below link
 		// https://docs.oracle.com/javafx/2/events/DraggablePanelsExample.java.htm
 
+		// The code for that was adopted and changed to use a a title pane
+		// instead of one the whole node - this is because we don't want the
+		// whole node to be dragable all the time.
+
 		TitledPane titlePane = new TitledPane();
 
 		titleText = new Text();
