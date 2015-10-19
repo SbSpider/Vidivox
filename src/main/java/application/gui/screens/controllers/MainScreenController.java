@@ -14,6 +14,7 @@ import org.apache.commons.io.FilenameUtils;
 import application.gui.Window;
 import application.gui.screens.components.VideoPlayer;
 import framework.ScratchDir;
+import framework.component.ClipTrack;
 import framework.component.PrefFileChooser;
 import framework.component.TreeViewDirectoryViewer;
 import framework.media.conversion.FFMPEGConverterTask;
@@ -95,39 +96,10 @@ public class MainScreenController implements Initializable {
 		mainScreen_Root.setCenter(videoPlayer);
 		mainScreen_Root.setLeft(dirTreeView);
 
-		Button bt = new Button();
-		mainScreen_Root.setBottom(bt);
-
-		/*
-		 * ffmpeg -y -i /home/spider/share/A4/bigbuckbunny206_2.mp4
-		 * ~/stripped.wav && sox -m -v0 ~/stripped.wav
-		 * "| sox /home/spider/share/temp/asda.wav -c 2 -p pad 3.349 "
-		 * ~/final.wav && ffmpeg -y -i
-		 * /home/spider/share/A4/bigbuckbunny206_2.mp4 -i ~/final.wav
-		 * -filter_complex
-		 * "[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge"
-		 * -acodec aac -strict -2 -preset ultrafast
-		 * /home/spider/share/temp/sada.mp4 && rm ~/stripped.wav ~/final.wav
-		 * 
-		 */
-		bt.setOnAction(event -> {
-			FFMPEGConverterTask task = new FFMPEGConverterTask(
-					"ffmpeg -y -i /home/spider/share/temp/bigbuckbunny206_2.mp4 -i ~/final.wav -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" -acodec aac -strict -2 -preset ultrafast /home/spider/share/temp/final.mp4");
-			task.setDuration(Duration.minutes(1));
-
-			Thread thread = new Thread(task);
-			thread.setDaemon(false);
-			thread.start();
-
-			ProgressBar bar = new ProgressBar();
-			bar.progressProperty().bind(task.progressProperty());
-
-			task.setOnSucceeded(event2 -> {
-				bar.setVisible(false);
-			});
-
-			mainScreen_Root.setRight(bar);
-		});
+		
+		ClipTrack clipTrack = new ClipTrack();
+		
+		mainScreen_Root.setBottom(clipTrack);
 	}
 
 	@FXML
