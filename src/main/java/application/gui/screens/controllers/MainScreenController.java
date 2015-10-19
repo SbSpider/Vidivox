@@ -94,22 +94,21 @@ public class MainScreenController implements Initializable {
 		saveProjectMenuItem.setDisable(true);
 
 		// Set locations
-//		mainScreen_Root.setCenter(videoPlayer);
+		// mainScreen_Root.setCenter(videoPlayer);
 		mainScreen_Root.setLeft(dirTreeView);
 
-		
 		ClipTrack clipTrack = new ClipTrack();
 		clipTrack.setMaxHeight(10);
 		clipTrack.setPrefHeight(10);
-		
+
 		clipTrack.setMaxWidth(videoPlayer.getMaxWidth());
 		clipTrack.setPrefWidth(videoPlayer.getPrefWidth());
-//		clipTrack.setwid
-		
+		// clipTrack.setwid
+
 		VBox centreBox = new VBox();
 		centreBox.getChildren().add(videoPlayer);
 		centreBox.getChildren().add(clipTrack);
-		
+
 		mainScreen_Root.setCenter(centreBox);
 
 	}
