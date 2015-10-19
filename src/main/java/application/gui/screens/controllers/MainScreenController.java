@@ -22,6 +22,7 @@ import framework.savefunction.SaveFileDO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -109,6 +110,8 @@ public class MainScreenController implements Initializable {
 		centreBox.getChildren().add(videoPlayer);
 		centreBox.getChildren().add(clipTrack);
 
+		centreBox.setAlignment(Pos.CENTER);
+		
 		mainScreen_Root.setCenter(centreBox);
 
 	}
