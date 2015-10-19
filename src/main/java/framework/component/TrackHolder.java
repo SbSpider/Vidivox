@@ -30,6 +30,9 @@ public class TrackHolder extends BorderPane {
 	public TrackHolder() {
 		slider = new Slider();
 		bar = new ProgressBar();
+		
+		slider.setMaxWidth(Double.MAX_VALUE);
+		bar.setMaxWidth(Double.MAX_VALUE);
 
 		GridPane top = new GridPane();
 
@@ -84,6 +87,9 @@ public class TrackHolder extends BorderPane {
 		centreList.getItems().clear();
 		// Add items
 		centreList.getItems().addAll(clips);
+
+		// Bind the pogress bar
+		slider.valueProperty().bind(vidPlayer.getProgressSliderProperty());
 	}
 
 }

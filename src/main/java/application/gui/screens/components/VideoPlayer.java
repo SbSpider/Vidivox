@@ -21,6 +21,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -527,6 +528,10 @@ public class VideoPlayer extends BorderPane {
 		public double mouseAnchorY;
 		public double initialTranslateX;
 		public double initialTranslateY;
+	}
+
+	public DoubleProperty getProgressSliderProperty() {
+		return progressSlider.valueProperty();
 	}
 
 	private File getOutputSaveFile() {
