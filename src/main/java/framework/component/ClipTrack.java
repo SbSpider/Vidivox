@@ -1,7 +1,13 @@
 package framework.component;
 
+import java.io.File;
+
+import framework.media.conversion.FFMPEGConverterTask;
+import framework.media.conversion.FFMPEGGenerateWaveform;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.media.Media;
 
 public class ClipTrack extends BorderPane {
 
@@ -9,14 +15,41 @@ public class ClipTrack extends BorderPane {
 
 	public ClipTrack() {
 
-		imageView = new ImageView("/waveform.png");
+		imageView = new ImageView();
 		imageView.setFitHeight(50);
 
 		imageView.setFitWidth(50);
-		// imageView.fitWidthProperty().bind(widthProperty());
 
 		setMaxHeight(50);
 		setCenter(imageView);
+	}
+
+	/**
+	 * Generate a ClipTrack from media
+	 * 
+	 * @param media
+	 */
+	public ClipTrack(Media media) {
+
+		this();
+
+		setMedia(media);
+
+	}
+
+	public void setMedia(Media media) {
+		String source = media.getSource();
+		source = source.substring("file:///".length());
+
+		FFMPEGGenerateWaveform generateTask = new FFMPEGGenerateWaveform(new File(source));
+		Thread thread = new Thread(generateTask);
+		thread.setDaemon(false);
+		thread.start();
+
+		generateTask.setOnSucceeded(event -> {
+			// Set the image once generated.
+			imageView.setImage(new Image("file:///" + generateTask.getValue().getAbsolutePath()));
+		});
 	}
 
 	@Override

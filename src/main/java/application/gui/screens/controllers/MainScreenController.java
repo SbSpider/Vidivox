@@ -9,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import javax.sound.sampled.Clip;
+
 import org.apache.commons.io.FilenameUtils;
 
 import application.gui.Window;
@@ -69,6 +71,7 @@ public class MainScreenController implements Initializable {
 	@FXML
 	MenuItem saveProjectAsMenuItem;
 	TreeViewDirectoryViewer dirTreeView;
+	private VBox centreBox;
 
 	/**
 	 * Initializes the screen.
@@ -98,6 +101,9 @@ public class MainScreenController implements Initializable {
 		// mainScreen_Root.setCenter(videoPlayer);
 		mainScreen_Root.setLeft(dirTreeView);
 
+		// ClipTrack clipTrack = new
+		// ClipTrack(videoPlayer.getMediaView().getMediaPlayer().getMedia());
+
 		ClipTrack clipTrack = new ClipTrack();
 		clipTrack.setMaxHeight(10);
 		clipTrack.setPrefHeight(10);
@@ -106,12 +112,12 @@ public class MainScreenController implements Initializable {
 		clipTrack.setPrefWidth(videoPlayer.getPrefWidth());
 		// clipTrack.setwid
 
-		VBox centreBox = new VBox();
+		centreBox = new VBox();
 		centreBox.getChildren().add(videoPlayer);
 		centreBox.getChildren().add(clipTrack);
 
 		centreBox.setAlignment(Pos.CENTER);
-		
+
 		mainScreen_Root.setCenter(centreBox);
 
 	}
@@ -142,6 +148,21 @@ public class MainScreenController implements Initializable {
 		Media media = new Media("file:///" + absolutePath);
 
 		videoPlayer.setNewVideoToPlay(media);
+
+		ClipTrack clipTrack = (ClipTrack) centreBox.getChildren().get(1);
+
+		Runnable onReady = videoPlayer.getMediaView().getMediaPlayer().getOnReady();
+
+		videoPlayer.getMediaView().getMediaPlayer().setOnReady(() -> {
+			clipTrack.setMedia(videoPlayer.getMediaView().getMediaPlayer().getMedia());
+
+			clipTrack.setMaxWidth(videoPlayer.getMaxWidth());
+			clipTrack.setPrefWidth(videoPlayer.getPrefWidth());
+			
+			// Run onready
+			onReady.run();
+		});
+
 	}
 
 	private String sanitiseFileName(String absolutePath) {
