@@ -105,6 +105,8 @@ public class TrackHolder extends BorderPane {
 						System.out.println("Adding file: " + file.getAbsolutePath());
 						clips.add(new ClipTrack(new Media("file:///" + file.getAbsolutePath())));
 
+						clips.forEach(clip -> clip.setProgressProperty(vidPlayer.getProgressSliderProperty(),
+								slider.getMax()));
 						centreList.getItems().clear();
 						centreList.getItems().addAll(clips);
 					}

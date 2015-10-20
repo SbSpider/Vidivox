@@ -24,9 +24,9 @@ public class ClipTrack extends BorderPane {
 	public ClipTrack() {
 
 		imageView = new ImageView();
-		imageView.setFitHeight(50);
+//		imageView.setFitHeight(50);
 
-		imageView.setFitWidth(50);
+//		imageView.setFitWidth(50);
 
 		bar = new ProgressBar();
 		bar.setId("clip-progress-bar");
