@@ -782,39 +782,40 @@ public class VideoPlayer extends BorderPane {
 	}
 
 	public void startMedia(Media media) {
+		
+		System.out.println("Starting media file: " + media.getSource());
 
 		MediaPlayer mediaPlayer = new MediaPlayer(media);
 		mediaPlayer.setAutoPlay(true);
 
 		mediaPlayer.seek(new Duration(0));
 
-		// Unload existing player
 		MediaPlayer existingMedia = mediaView.getMediaPlayer();
 		if (existingMedia != null) {
-			existingMedia.stop();
+			existingMedia.dispose();
 			existingMedia = null;
+			
+			System.out.println("Killed old media");
 		}
 
 		mediaView.setMediaPlayer(mediaPlayer);
 
-		MediaPlayer mp = mediaView.getMediaPlayer();
-
 		// https://docs.oracle.com/javase/8/javafx/media-tutorial/playercontrol.htm
 		// was used.
-		mp.currentTimeProperty().addListener(new InvalidationListener() {
+		mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
 			public void invalidated(Observable ov) {
 				updateValues();
 			}
 		});
 
-		mp.setOnReady(new Runnable() {
+		mediaPlayer.setOnReady(new Runnable() {
 			public void run() {
-				mediaOnReady(mp);
+				mediaOnReady(mediaPlayer);
 
 			}
 		});
 
-		mp.setOnEndOfMedia(() -> {
+		mediaPlayer.setOnEndOfMedia(() -> {
 			// When the media is finished, we want to pause the video (i.e. have
 			// the button set to pause).
 			pauseVideo();
@@ -826,7 +827,7 @@ public class VideoPlayer extends BorderPane {
 				if (progressSlider.isValueChanging()) {
 					// multiply duration by percentage calculated by slider
 					// position
-					mp.seek(duration.multiply(progressSlider.getValue() / 100.0));
+					mediaPlayer.seek(duration.multiply(progressSlider.getValue() / 100.0));
 				}
 			}
 		});
