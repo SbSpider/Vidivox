@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 
 import javax.sound.sampled.Clip;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import application.gui.Window;
@@ -183,6 +184,7 @@ public class MainScreenController implements Initializable {
 		saveFileDO = getSaveObjects(saveFileDO);
 
 		saveProjectToFile(saveFile, saveFileDO);
+
 	}
 
 	private SaveFileDO getSaveObjects(SaveFileDO saveFileDO) {
@@ -267,6 +269,11 @@ public class MainScreenController implements Initializable {
 		saveProjectMenuItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
 
 		initTreeview(saveFile);
+
+		// Copy the scratchdir to the new location
+		File scratchDir = ScratchDir.getScratchDir();
+		
+		FileUtils.copyDirectory(scratchDir, saveFile.getParentFile());
 
 		// Setup scratch location.
 		ScratchDir.setScratchDir(saveFile.getParentFile());
