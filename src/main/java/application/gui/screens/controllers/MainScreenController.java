@@ -9,38 +9,29 @@ import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import javax.sound.sampled.Clip;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 
 import application.gui.Window;
 import application.gui.screens.components.VideoPlayer;
 import framework.ScratchDir;
-import framework.component.ClipTrack;
 import framework.component.PrefFileChooser;
 import framework.component.TrackHolder;
 import framework.component.TreeViewDirectoryViewer;
-import framework.media.conversion.FFMPEGConverterTask;
 import framework.savefunction.SaveFileDO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.stage.FileChooser.ExtensionFilter;
-import javafx.util.Duration;
 
 /**
  * THe controller for the main screen.
@@ -272,7 +263,7 @@ public class MainScreenController implements Initializable {
 
 		// Copy the scratchdir to the new location
 		File scratchDir = ScratchDir.getScratchDir();
-		
+
 		FileUtils.copyDirectory(scratchDir, saveFile.getParentFile());
 
 		// Setup scratch location.

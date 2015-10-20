@@ -36,7 +36,7 @@ public class FFMPEGGenerateWaveform extends Task<File> {
 		String inputFilePath = inputFile.getAbsolutePath();
 
 		// Generate the output file name.
-		String outputFilePath = ScratchDir.getScratchDir().getAbsolutePath()
+		String outputFilePath = ScratchDir.getScratchDir().getAbsolutePath() + "/"
 				+ FilenameUtils.removeExtension(FilenameUtils.getBaseName(inputFilePath)) + ".png";
 
 		// The patht to the file specifying how to plot (stored in jar file).
@@ -53,10 +53,10 @@ public class FFMPEGGenerateWaveform extends Task<File> {
 					+ "0:a -c:a pcm_s16le -f data - | gnuplot " + gnuPlotPath + " > " + outputFilePath;
 			ProcessBuilder procBuilder = new ProcessBuilder("/bin/bash", "-c", command);
 			procBuilder.redirectErrorStream(true);
-			
+
 			System.out.println("Using command:\n");
 			System.out.println(command);
-			
+
 			Process process = procBuilder.start();
 
 			InputStream inputStream = process.getInputStream();
