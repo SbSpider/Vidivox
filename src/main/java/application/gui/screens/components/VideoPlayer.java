@@ -23,6 +23,7 @@ import javafx.beans.Observable;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
@@ -152,6 +153,10 @@ public class VideoPlayer extends BorderPane {
 	private FlowPane bottomMergingButtonFlowPane;
 	private Text titleText;
 
+	private DoubleProperty audioVolumeProperty = new SimpleDoubleProperty(1);
+	private DoubleProperty videoVolumeProperty = new SimpleDoubleProperty(1);
+	private DoubleProperty masterVolumeProperty = new SimpleDoubleProperty(1);
+
 	public VideoPlayer() {
 
 		setId("videoPlayer");
@@ -204,6 +209,7 @@ public class VideoPlayer extends BorderPane {
 		progressBar.setMaxWidth(Double.MAX_VALUE);
 
 		progressSlider = new Slider();
+		progressSlider.setId("player-slider");
 		progressSlider.setMaxWidth(Double.MAX_VALUE);
 
 		progressSlider.valueProperty().set(0);
@@ -379,7 +385,7 @@ public class VideoPlayer extends BorderPane {
 				String outputName = saveFile.getAbsolutePath();
 				mergeWithAudioAtLocation(mp3File.getAbsolutePath(), outputName);
 
-				startMedia(new Media("file:///" + saveFile.getAbsolutePath()));
+//				startMedia(new Media("file:///" + saveFile.getAbsolutePath()));
 			} else {
 				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
@@ -450,7 +456,7 @@ public class VideoPlayer extends BorderPane {
 				String outputName = saveFile.getAbsolutePath();
 				mergeWithAudioAtLocation(ttsFilename, outputName);
 
-				startMedia(new Media("file:///" + sanitiseFileName(saveFile.getAbsolutePath())));
+//				startMedia(new Media("file:///" + sanitiseFileName(saveFile.getAbsolutePath())));
 			} else {
 				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
@@ -546,19 +552,6 @@ public class VideoPlayer extends BorderPane {
 	}
 
 	private void mergeWithAudioAtLocation(String mp3File, String outputFile) {
-		// FileChooser chooser = new FileChooser();
-		// chooser.setInitialDirectory(new
-		// File(System.getProperty("user.home")));
-		// chooser.getExtensionFilters().addAll(new
-		// FileChooser.ExtensionFilter("MP4", "*.mp4"),
-		// new FileChooser.ExtensionFilter("All Files", "*"));
-		//
-		// File mp4File = chooser.showOpenDialog(Window.getPrimaryStage());
-		//
-		// if (mp4File == null) {
-		// System.out.println("No mp4 file chosen");
-		// return;
-		// }
 		File mp4File = getMp4FileFromCurrentlyPlayingMedia();
 
 		// http://stackoverflow.com/questions/9027317/how-to-convert-milliseconds-to-hhmmss-format
@@ -657,69 +650,6 @@ public class VideoPlayer extends BorderPane {
 
 			tempFinalAudioFile.delete();
 		});
-
-		// String ffmpegCommand = "ffmpeg -y -i " + mp4File.getAbsolutePath() +
-		// " ~/stripped.wav && ";
-		// ffmpegCommand += "sox -m -v0 ~/stripped.wav \"| sox " + mp3File + "
-		// -c 2 -p pad " + seconds
-		// + " \" ~/final.wav && ";
-		// ffmpegCommand += "ffmpeg -y -i " + mp4File.getAbsolutePath()
-		// + " -i ~/final.wav -filter_complex
-		// \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\"
-		// "
-		// + "-acodec aac -strict -2 -preset ultrafast " + outputFile + " && " +
-		// "rm ~/stripped.wav ~/final.wav";
-		//
-		// System.out.println("Command:\n" + ffmpegCommand);
-		//
-		// ProcessBuilder procBuilder = null;
-		//
-		// String os = System.getProperty("os.name").toLowerCase();
-		// if (os.contains("win")) {
-		// procBuilder = new ProcessBuilder("cmd", "/c", ffmpegCommand);
-		// } else {
-		// procBuilder = new ProcessBuilder("/bin/bash", "-c", ffmpegCommand);
-		// }
-		//
-		// Alert convertAlert = new Alert(AlertType.INFORMATION, "Merging audio
-		// file into video", ButtonType.OK);
-		// convertAlert.setWidth(400);
-		// convertAlert.setHeight(300);
-		// convertAlert.initModality(Modality.APPLICATION_MODAL);
-		// convertAlert.initOwner(Window.getPrimaryStage());
-		//
-		// convertAlert.show();
-		//
-		// procBuilder.redirectErrorStream(true);
-		// try {
-		// Process process = procBuilder.start();
-		//
-		// InputStream inputStream = process.getInputStream();
-		// OutputStream outputStream = process.getOutputStream();
-		//
-		// BufferedReader reader = new BufferedReader(new
-		// InputStreamReader(inputStream));
-		//
-		// String line = null;
-		//
-		// while ((line = reader.readLine()) != null) {
-		// System.out.println("Process: " + line);
-		// }
-		//
-		// } catch (Exception e) {
-		// System.out.println("Failed process");
-		// e.printStackTrace();
-		// }
-		//
-		// convertAlert.close();
-		//
-		// Alert convertedAlert = new Alert(AlertType.INFORMATION,
-		// "Video has been converted. Please open the saved location using the
-		// open video command to view.",
-		// ButtonType.OK);
-		// convertedAlert.setWidth(400);
-		// convertedAlert.setHeight(300);
-		// convertedAlert.showAndWait();
 	}
 
 	/**
@@ -782,7 +712,7 @@ public class VideoPlayer extends BorderPane {
 	}
 
 	public void startMedia(Media media) {
-		
+
 		System.out.println("Starting media file: " + media.getSource());
 
 		MediaPlayer mediaPlayer = new MediaPlayer(media);
@@ -794,7 +724,7 @@ public class VideoPlayer extends BorderPane {
 		if (existingMedia != null) {
 			existingMedia.dispose();
 			existingMedia = null;
-			
+
 			System.out.println("Killed old media");
 		}
 
@@ -918,10 +848,20 @@ public class VideoPlayer extends BorderPane {
 		return progressSlider.getMax();
 	}
 
+	public DoubleProperty getAudioVolumeProperty() {
+		return audioVolumeProperty;
+	}
+
+	public DoubleProperty getVideoVolumeProperty() {
+		return videoVolumeProperty;
+	}
+
+	public DoubleProperty getMasterVolumeProperty() {
+		return masterVolumeProperty;
+	}
+
 	public void setNewVideoToPlay(Media media) {
-
 		startMedia(media);
-
 	}
 
 	public void useSaveFile(SaveFileDO saveFile) {

@@ -16,7 +16,7 @@
 .menu-item .label {
 	-fx-background-color : white;
 } 
-.slider .track {
+#player-slider .track {
     -fx-background-color:null;  /* Hide the track */
     -fx-background-insets: 1.0 0.0 -1.0 0.0, 0.0, 1.0;
     -fx-background-radius: 2.5, 2.5, 1.5;

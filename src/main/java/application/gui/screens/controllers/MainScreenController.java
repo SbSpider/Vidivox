@@ -15,6 +15,7 @@ import org.apache.commons.io.FilenameUtils;
 import application.gui.Window;
 import application.gui.screens.components.VideoPlayer;
 import framework.ScratchDir;
+import framework.component.EditingOptions;
 import framework.component.PrefFileChooser;
 import framework.component.TrackHolder;
 import framework.component.TreeViewDirectoryViewer;
@@ -65,6 +66,7 @@ public class MainScreenController implements Initializable {
 	MenuItem saveProjectAsMenuItem;
 	TreeViewDirectoryViewer dirTreeView;
 	private TrackHolder trackHolder;
+	EditingOptions editingOptions;
 
 	/**
 	 * Initializes the screen.
@@ -106,8 +108,21 @@ public class MainScreenController implements Initializable {
 
 		mainScreen_Root.setBottom(trackHolder);
 
+		editingOptions = new EditingOptions();
+
+		mainScreen_Root.setRight(editingOptions);
+
 		// Hide the track holder until there is a video present
 		trackHolder.setVisible(false);
+
+		editingOptions.setMaxWidth(dirTreeView.getMaxWidth());
+		editingOptions.setMaxHeight(dirTreeView.getMaxHeight());
+		editingOptions.setPrefWidth(dirTreeView.getPrefWidth());
+		editingOptions.setPrefHeight(dirTreeView.getPrefHeight());
+		
+		videoPlayer.getAudioVolumeProperty().bind(editingOptions.getAudioProperty());
+		videoPlayer.getVideoVolumeProperty().bind(editingOptions.getVideoProperty());
+		videoPlayer.getMasterVolumeProperty().bind(editingOptions.getMasterProperty());
 
 	}
 
