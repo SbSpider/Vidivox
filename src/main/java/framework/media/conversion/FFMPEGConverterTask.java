@@ -11,7 +11,8 @@ import javafx.util.Duration;
 
 public class FFMPEGConverterTask extends Task<Void> {
 
-	private static final String STRICT_2_PRESET_ULTRAFAST = " -strict -2 -preset ultrafast ";
+	private static final String COMMON_SET = " -strict -2 -preset ultrafast -ac 2 ";
+	
 	/**
 	 * Command to perform via ffmpeg
 	 */
@@ -58,7 +59,7 @@ public class FFMPEGConverterTask extends Task<Void> {
 		this();
 		command += "-i " + inputVideoFilePath + " -i " + inputAudioFilePath
 				+ " -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" "
-				+ " -acodec aac " + STRICT_2_PRESET_ULTRAFAST + outputFilePath;
+				+ " -acodec aac " + COMMON_SET + outputFilePath;
 	}
 
 	/**
