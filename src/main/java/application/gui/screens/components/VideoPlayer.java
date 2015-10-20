@@ -812,7 +812,12 @@ public class VideoPlayer extends BorderPane {
 				mediaOnReady(mp);
 
 			}
+		});
 
+		mp.setOnEndOfMedia(() -> {
+			// When the media is finished, we want to pause the video (i.e. have
+			// the button set to pause).
+			pauseVideo();
 		});
 
 		// Value changing property for the sliding action.
