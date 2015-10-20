@@ -222,6 +222,8 @@ public class MainScreenController implements Initializable {
 		ObjectInputStream ois = new ObjectInputStream(fs);
 		SaveFileDO saveFileDO = (SaveFileDO) ois.readObject();
 
+		ScratchDir.setScratchDir(saveFile.getParentFile());
+
 		videoPlayer.useSaveFile(saveFileDO);
 
 		initTreeview(saveFile);

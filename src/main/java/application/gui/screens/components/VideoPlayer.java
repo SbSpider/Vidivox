@@ -379,7 +379,7 @@ public class VideoPlayer extends BorderPane {
 				String outputName = saveFile.getAbsolutePath();
 				mergeWithAudioAtLocation(mp3File.getAbsolutePath(), outputName);
 
-				startMedia(new Media("file:///" + saveFile.getAbsolutePath().replaceAll("\\", "/")));
+				startMedia(new Media("file:///" + saveFile.getAbsolutePath()));
 			} else {
 				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
@@ -405,7 +405,7 @@ public class VideoPlayer extends BorderPane {
 			try {
 				ttsRoot = loader.load();
 			} catch (Exception e) {
-				System.out.println("Fialed to load fxml");
+				System.out.println("Failed to load fxml");
 				e.printStackTrace();
 			}
 			Scene scene = new Scene(ttsRoot);

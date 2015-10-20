@@ -2,14 +2,17 @@ package framework.component;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.stream.Collectors;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.TransferMode;
 import javafx.util.Duration;
 
 /**
@@ -41,6 +44,28 @@ public class TreeViewDirectoryViewer extends TreeView<File> {
 
 		treeSearchTimeline.setCycleCount(Timeline.INDEFINITE);
 		treeSearchTimeline.stop();
+
+		// Was used
+		// http://docs.oracle.com/javafx/2/drag_drop/jfxpub-drag_drop.htm
+		setOnDragDetected(new EventHandler<MouseEvent>() {
+			public void handle(MouseEvent event) {
+				
+				System.out.println("Entered");
+				
+				/* drag was detected, start a drag-and-drop gesture */
+				/* allow any transfer mode */
+				Dragboard db = startDragAndDrop(TransferMode.ANY);
+
+				/* Put a string on a dragboard */
+				ClipboardContent content = new ClipboardContent();
+				// Put selected files into the content
+				content.putFiles(getSelectionModel().getSelectedItems().stream().map(TreeItem<File>::getValue)
+						.collect(Collectors.toList()));
+				db.setContent(content);
+
+				event.consume();
+			}
+		});
 
 	}
 
