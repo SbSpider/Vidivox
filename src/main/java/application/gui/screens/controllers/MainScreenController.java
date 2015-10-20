@@ -106,6 +106,9 @@ public class MainScreenController implements Initializable {
 
 		mainScreen_Root.setBottom(trackHolder);
 
+		// Hide the track holder until there is a video present
+		trackHolder.setVisible(false);
+
 	}
 
 	@FXML
@@ -135,6 +138,11 @@ public class MainScreenController implements Initializable {
 
 		videoPlayer.setNewVideoToPlay(media);
 
+		updateVideoSources();
+
+	}
+
+	private void updateVideoSources() {
 		Runnable onReady = videoPlayer.getMediaView().getMediaPlayer().getOnReady();
 
 		videoPlayer.getMediaView().getMediaPlayer().setOnReady(() -> {
@@ -144,6 +152,8 @@ public class MainScreenController implements Initializable {
 			onReady.run();
 		});
 
+		// Make the holder visible.
+		trackHolder.setVisible(true);
 	}
 
 	private String sanitiseFileName(String absolutePath) {
@@ -215,6 +225,8 @@ public class MainScreenController implements Initializable {
 		videoPlayer.useSaveFile(saveFileDO);
 
 		initTreeview(saveFile);
+		
+		updateVideoSources();
 	}
 
 	/**
@@ -273,7 +285,7 @@ public class MainScreenController implements Initializable {
 	private void initTreeview(File saveFile) throws IOException {
 		dirTreeView = new TreeViewDirectoryViewer(saveFile.getParentFile());
 		dirTreeView.setupTreeView();
-		
+
 		dirTreeView.runBackground();
 
 		mainScreen_Root.setLeft(dirTreeView);

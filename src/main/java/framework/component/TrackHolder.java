@@ -82,6 +82,7 @@ public class TrackHolder extends BorderPane {
 		this.vidPlayer = vidPlayer;
 
 		Media media = vidPlayer.getMediaView().getMediaPlayer().getMedia();
+		clips.clear();
 		clips.add(new ClipTrack(media));
 
 		centreList.getItems().clear();
