@@ -234,7 +234,7 @@ public class VideoPlayer extends BorderPane {
 		buttonBar = new HBox();
 		buttonBar.setAlignment(Pos.CENTER);
 
-		playPauseButton = new Button(">");
+		playPauseButton = new Button("||");
 		stepForwardButton = new Button("|>");
 		stepBackwardButton = new Button("<|");
 		fastForwardButton = new Button(">>");
@@ -288,9 +288,9 @@ public class VideoPlayer extends BorderPane {
 		playPauseButton.setOnAction(event -> {
 			stopTimeline();
 
-			if (playPauseButton.getText().equals(">")) {
+			if (playPauseButton.getText().equals("||")) {
 				pauseVideo();
-			} else if (playPauseButton.getText().equals("||")) {
+			} else if (playPauseButton.getText().equals(">")) {
 				playVideo();
 			}
 		});
@@ -381,7 +381,7 @@ public class VideoPlayer extends BorderPane {
 
 				startMedia(new Media("file:///" + saveFile.getAbsolutePath().replaceAll("\\", "/")));
 			} else {
-				if (playPauseButton.getText().equals("||")) {
+				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
 				}
 			}
@@ -411,7 +411,7 @@ public class VideoPlayer extends BorderPane {
 			Scene scene = new Scene(ttsRoot);
 
 			// Pause the video
-			if (playPauseButton.getText().equals(">")) {
+			if (playPauseButton.getText().equals("||")) {
 				playPauseButton.fire();
 			}
 
@@ -427,7 +427,7 @@ public class VideoPlayer extends BorderPane {
 
 			// Quit if the returned file is null i.e. they closed the box.
 			if (ttsFilename == null) {
-				if (playPauseButton.getText().equals("||")) {
+				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
 				}
 				return;
@@ -452,7 +452,7 @@ public class VideoPlayer extends BorderPane {
 
 				startMedia(new Media("file:///" + sanitiseFileName(saveFile.getAbsolutePath())));
 			} else {
-				if (playPauseButton.getText().equals("||")) {
+				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
 				}
 			}
@@ -741,12 +741,12 @@ public class VideoPlayer extends BorderPane {
 	}
 
 	private void playVideo() {
-		playPauseButton.setText(">");
+		playPauseButton.setText("||");
 		mediaView.getMediaPlayer().play();
 	}
 
 	private void pauseVideo() {
-		playPauseButton.setText("||");
+		playPauseButton.setText(">");
 		mediaView.getMediaPlayer().pause();
 	}
 
