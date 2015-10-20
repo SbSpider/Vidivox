@@ -241,7 +241,7 @@ public class MainScreenController implements Initializable {
 			return;
 		}
 
-		if (!FilenameUtils.isExtension(saveFile.getAbsolutePath(), ".vvoxproj")) {
+		if (!saveFile.getAbsolutePath().endsWith(".vvoxproj")) {
 			saveFile = new File(saveFile.getAbsolutePath() + ".vvoxproj");
 		}
 
