@@ -8,6 +8,11 @@
 	-fx-font-weight : bold;
 }
 
+.titled-pane > .title 
+{
+	-fx-background-color: #BFB8B3;
+}
+
 .menu-item .label {
 	-fx-background-color : white;
 } 
@@ -32,8 +37,9 @@
 #videoPlayer {
 	-fx-background-color : #BFB8B3;
 	
-  	-fx-border-color: linear-gradient(from 0% 0% to 0% 100%, lightgrey, grey);
-  	-fx-border-width: 7.5;	
+  	-fx-border-color: linear-gradient(from 0% 0% to 0% 100%, #BFB8B3, grey);
+  	-fx-border-style: hidden solid solid solid;
+  	-fx-border-width: 0 7.5 7.5 7.5;	
 }
 
 #clip-progress-bar .track {
