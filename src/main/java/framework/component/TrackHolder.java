@@ -90,6 +90,8 @@ public class TrackHolder extends BorderPane {
 
 		// Bind the pogress bar
 		slider.valueProperty().bind(vidPlayer.getProgressSliderProperty());
+		
+		clips.forEach(clip -> clip.setProgressProperty(vidPlayer.getProgressSliderProperty(), slider.getMax()));
 	}
 
 }

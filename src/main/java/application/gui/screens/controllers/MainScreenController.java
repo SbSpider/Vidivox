@@ -167,6 +167,7 @@ public class MainScreenController implements Initializable {
 
 			clipTrack.setMaxWidth(videoPlayer.getMaxWidth());
 			clipTrack.setPrefWidth(videoPlayer.getPrefWidth());
+			clipTrack.setProgressProperty(videoPlayer.getProgressSliderProperty(), videoPlayer.getMaxSliderValue());
 
 			trackHolder.setVideoSource(videoPlayer);
 

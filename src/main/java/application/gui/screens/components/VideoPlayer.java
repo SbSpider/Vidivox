@@ -908,6 +908,10 @@ public class VideoPlayer extends BorderPane {
 		return mediaView;
 	}
 
+	public double getMaxSliderValue() {
+		return progressSlider.getMax();
+	}
+
 	public void setNewVideoToPlay(Media media) {
 
 		startMedia(media);

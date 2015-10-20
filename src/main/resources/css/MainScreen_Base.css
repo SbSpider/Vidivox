@@ -35,3 +35,11 @@
   	-fx-border-color: linear-gradient(from 0% 0% to 0% 100%, lightgrey, grey);
   	-fx-border-width: 7.5;	
 }
+
+#clip-progress-bar .track {
+	-fx-background-color: transparent;
+}
+
+#clip-progress-bar .bar {
+	-fx-background-color: rgba(0,0,0,0.5);
+}
