@@ -3,8 +3,14 @@ package framework.component;
 import java.io.File;
 import java.io.IOException;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.util.Duration;
 
 /**
  * TreeView that, given a directory, will show it in a treeview.
@@ -16,16 +22,39 @@ public class TreeViewDirectoryViewer extends TreeView<File> {
 
 	File dir;
 
+	Timeline treeSearchTimeline;
+
 	/**
 	 * Default
 	 */
 	public TreeViewDirectoryViewer() {
 		setPrefWidth(300);
+
+		treeSearchTimeline = new Timeline(new KeyFrame(Duration.seconds(5), event -> {
+			try {
+				setupTreeView();
+			} catch (Exception e) {
+				System.out.println("Failed to update treeview from directory");
+				e.printStackTrace();
+			}
+		}));
+
+		treeSearchTimeline.setCycleCount(Timeline.INDEFINITE);
+		treeSearchTimeline.stop();
+
 	}
 
 	public TreeViewDirectoryViewer(File dir) {
 		this();
 		this.dir = dir;
+	}
+
+	public void runBackground() {
+		treeSearchTimeline.play();
+	}
+
+	public void stopBackground() {
+		treeSearchTimeline.stop();
 	}
 
 	/**

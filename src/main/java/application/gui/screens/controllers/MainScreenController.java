@@ -273,6 +273,8 @@ public class MainScreenController implements Initializable {
 	private void initTreeview(File saveFile) throws IOException {
 		dirTreeView = new TreeViewDirectoryViewer(saveFile.getParentFile());
 		dirTreeView.setupTreeView();
+		
+		dirTreeView.runBackground();
 
 		mainScreen_Root.setLeft(dirTreeView);
 	}
