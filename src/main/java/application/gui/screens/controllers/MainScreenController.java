@@ -72,7 +72,6 @@ public class MainScreenController implements Initializable {
 	@FXML
 	MenuItem saveProjectAsMenuItem;
 	TreeViewDirectoryViewer dirTreeView;
-	private VBox centreBox;
 	private TrackHolder trackHolder;
 
 	/**
@@ -109,21 +108,7 @@ public class MainScreenController implements Initializable {
 		// ClipTrack clipTrack = new
 		// ClipTrack(videoPlayer.getMediaView().getMediaPlayer().getMedia());
 
-		ClipTrack clipTrack = new ClipTrack();
-		clipTrack.setMaxHeight(10);
-		clipTrack.setPrefHeight(10);
-
-		clipTrack.setMaxWidth(videoPlayer.getMaxWidth());
-		clipTrack.setPrefWidth(videoPlayer.getPrefWidth());
-		// clipTrack.setwid
-
-		centreBox = new VBox();
-		centreBox.getChildren().add(videoPlayer);
-		centreBox.getChildren().add(clipTrack);
-
-		centreBox.setAlignment(Pos.CENTER);
-
-		mainScreen_Root.setCenter(centreBox);
+		mainScreen_Root.setCenter(videoPlayer);
 
 		trackHolder = new TrackHolder();
 
@@ -158,17 +143,9 @@ public class MainScreenController implements Initializable {
 
 		videoPlayer.setNewVideoToPlay(media);
 
-		ClipTrack clipTrack = (ClipTrack) centreBox.getChildren().get(1);
-
 		Runnable onReady = videoPlayer.getMediaView().getMediaPlayer().getOnReady();
 
 		videoPlayer.getMediaView().getMediaPlayer().setOnReady(() -> {
-			clipTrack.setMedia(videoPlayer.getMediaView().getMediaPlayer().getMedia());
-
-			clipTrack.setMaxWidth(videoPlayer.getMaxWidth());
-			clipTrack.setPrefWidth(videoPlayer.getPrefWidth());
-			clipTrack.setProgressProperty(videoPlayer.getProgressSliderProperty(), videoPlayer.getMaxSliderValue());
-
 			trackHolder.setVideoSource(videoPlayer);
 
 			// Run onready
