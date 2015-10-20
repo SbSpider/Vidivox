@@ -30,7 +30,7 @@ public class TrackHolder extends BorderPane {
 	public TrackHolder() {
 		slider = new Slider();
 		bar = new ProgressBar();
-		
+
 		slider.setMaxWidth(Double.MAX_VALUE);
 		bar.setMaxWidth(Double.MAX_VALUE);
 
@@ -43,7 +43,7 @@ public class TrackHolder extends BorderPane {
 		col1.setHalignment(HPos.CENTER);
 
 		RowConstraints row1 = new RowConstraints();
-//		row1.setMinHeight(10);
+		// row1.setMinHeight(10);
 		row1.setPrefHeight(30);
 		row1.setVgrow(Priority.SOMETIMES);
 
@@ -54,21 +54,8 @@ public class TrackHolder extends BorderPane {
 		top.add(bar, 0, 0);
 
 		slider.valueProperty().set(0);
-		slider.valueProperty().addListener((observable, oldValue, newValue) -> {
 
-			double value = (Double) newValue / slider.getMax();
-
-			// This little block just adjusts the progress so that it
-			// appears under the slider object rather than not.
-			if (value < 0.25) {
-				value += 0.02;
-			} else if (value < 0.5) {
-				value += 0.001;
-			} else if (value < 0.75) {
-				value += 0.0001;
-			}
-			bar.setProgress(value);
-		});
+		bar.progressProperty().bind(slider.valueProperty().divide(slider.getMax()));
 
 		clips = new ArrayList<ClipTrack>();
 		centreList = new ListView<ClipTrack>();
@@ -91,7 +78,7 @@ public class TrackHolder extends BorderPane {
 
 		// Bind the pogress bar
 		slider.valueProperty().bind(vidPlayer.getProgressSliderProperty());
-		
+
 		clips.forEach(clip -> clip.setProgressProperty(vidPlayer.getProgressSliderProperty(), slider.getMax()));
 	}
 

@@ -40,8 +40,8 @@ public class ClipTrack extends BorderPane {
 		col1.setHalignment(HPos.CENTER);
 
 		RowConstraints row1 = new RowConstraints();
-//		row1.setMinHeight(10);
-//		row1.setPrefHeight(30);
+		// row1.setMinHeight(10);
+		// row1.setPrefHeight(30);
 		row1.setVgrow(Priority.SOMETIMES);
 
 		center.getColumnConstraints().addAll(col1);
@@ -50,13 +50,13 @@ public class ClipTrack extends BorderPane {
 		center.add(imageView, 0, 0);
 		center.add(bar, 0, 0);
 
-//		setMaxHeight(50);
+		// setMaxHeight(50);
 		setCenter(center);
-		
+
 		bar.prefWidthProperty().bind(widthProperty());
 		bar.prefHeightProperty().bind(heightProperty());
-		
-//		bar.setVisible(false);
+
+		// bar.setVisible(false);
 	}
 
 	/**
@@ -86,24 +86,25 @@ public class ClipTrack extends BorderPane {
 			imageView.setImage(new Image("file:///" + generateTask.getValue().getAbsolutePath()));
 		});
 	}
-	
-	public void setProgressProperty(DoubleProperty prop, double max){
-		bar.setVisible(true);
-		prop.addListener((observable, oldValue, newValue) -> {
-			
-			double value = (Double) newValue / max;
 
-			// This little block just adjusts the progress so that it
-			// appears under the slider object rather than not.
-			if (value < 0.25) {
-				value += 0.02;
-			} else if (value < 0.5) {
-				value += 0.001;
-			} else if (value < 0.75) {
-				value += 0.0001;
-			}
-			bar.setProgress(value);
-		});
+	public void setProgressProperty(DoubleProperty prop, double max) {
+		bar.setVisible(true);
+		// prop.addListener((observable, oldValue, newValue) -> {
+		//
+		// double value = (Double) newValue / max;
+		//
+		// // This little block just adjusts the progress so that it
+		// // appears under the slider object rather than not.
+		// if (value < 0.25) {
+		// value += 0.02;
+		// } else if (value < 0.5) {
+		// value += 0.001;
+		// } else if (value < 0.75) {
+		// value += 0.0001;
+		// }
+		// bar.setProgress(value);
+		// });
+		bar.progressProperty().bind(prop.divide(max));
 	}
 
 	@Override
