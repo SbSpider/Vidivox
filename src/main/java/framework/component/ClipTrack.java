@@ -40,8 +40,8 @@ public class ClipTrack extends BorderPane {
 		col1.setHalignment(HPos.CENTER);
 
 		RowConstraints row1 = new RowConstraints();
-		row1.setMinHeight(10);
-		row1.setPrefHeight(30);
+//		row1.setMinHeight(10);
+//		row1.setPrefHeight(30);
 		row1.setVgrow(Priority.SOMETIMES);
 
 		center.getColumnConstraints().addAll(col1);
@@ -50,7 +50,7 @@ public class ClipTrack extends BorderPane {
 		center.add(imageView, 0, 0);
 		center.add(bar, 0, 0);
 
-		setMaxHeight(50);
+//		setMaxHeight(50);
 		setCenter(center);
 		
 		bar.prefWidthProperty().bind(widthProperty());

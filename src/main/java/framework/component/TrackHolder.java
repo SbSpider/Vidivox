@@ -43,7 +43,7 @@ public class TrackHolder extends BorderPane {
 		col1.setHalignment(HPos.CENTER);
 
 		RowConstraints row1 = new RowConstraints();
-		row1.setMinHeight(10);
+//		row1.setMinHeight(10);
 		row1.setPrefHeight(30);
 		row1.setVgrow(Priority.SOMETIMES);
 
