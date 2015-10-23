@@ -66,14 +66,17 @@ public class VideoPlayer extends BorderPane {
 	 * The media view;
 	 */
 	MediaView mediaView;
+
 	/**
 	 * The gridpane at the bottom.
 	 */
 	GridPane bottomGridPane;
+
 	/**
 	 * The progress bar.
 	 */
 	ProgressBar progressBar;
+
 	/**
 	 * The progress slider.
 	 */
@@ -98,14 +101,17 @@ public class VideoPlayer extends BorderPane {
 	 * Used to play and pause the video.
 	 */
 	Button playPauseButton;
+
 	/**
 	 * Steps a frame forward in the video.
 	 */
 	Button stepForwardButton;
+
 	/**
 	 * Steps a frame backward in the video.
 	 */
 	Button stepBackwardButton;
+
 	/**
 	 * Reverses the video.
 	 */
@@ -385,7 +391,8 @@ public class VideoPlayer extends BorderPane {
 				String outputName = saveFile.getAbsolutePath();
 				mergeWithAudioAtLocation(mp3File.getAbsolutePath(), outputName);
 
-//				startMedia(new Media("file:///" + saveFile.getAbsolutePath()));
+				// startMedia(new Media("file:///" +
+				// saveFile.getAbsolutePath()));
 			} else {
 				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
@@ -456,7 +463,8 @@ public class VideoPlayer extends BorderPane {
 				String outputName = saveFile.getAbsolutePath();
 				mergeWithAudioAtLocation(ttsFilename, outputName);
 
-//				startMedia(new Media("file:///" + sanitiseFileName(saveFile.getAbsolutePath())));
+				// startMedia(new Media("file:///" +
+				// sanitiseFileName(saveFile.getAbsolutePath())));
 			} else {
 				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
