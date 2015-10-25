@@ -4,26 +4,18 @@ import java.io.File;
 
 import framework.media.conversion.FFMPEGGenerateWaveform;
 import javafx.beans.property.DoubleProperty;
-import javafx.event.EventHandler;
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
-import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.paint.Paint;
 
 public class ClipTrack extends BorderPane {
 
@@ -86,8 +78,8 @@ public class ClipTrack extends BorderPane {
 		this(primary);
 		setMedia(media);
 	}
-	
-	public boolean getPrimary(){
+
+	public boolean getPrimary() {
 		return primary;
 	}
 
@@ -134,10 +126,10 @@ public class ClipTrack extends BorderPane {
 			});
 		});
 
-		if (!primary) {
+		setOnMouseClicked(event -> {
+			System.out.println("I GOT CLICKS!!!");
+		});
 
-
-		}
 	}
 
 	public void setClipMax(double maxTrackWidth) {
@@ -174,10 +166,10 @@ public class ClipTrack extends BorderPane {
 		double x;
 		double y;
 	}
-	
+
 	DragContext dragContext = new DragContext();
-	
-	public DragContext getDragContext(){
+
+	public DragContext getDragContext() {
 		return dragContext;
 	}
 

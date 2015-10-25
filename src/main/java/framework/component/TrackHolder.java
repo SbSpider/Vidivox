@@ -90,11 +90,10 @@ public class TrackHolder extends BorderPane {
 					 */
 					event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
 				}
-
 				event.consume();
 			}
 		});
-
+	
 		setOnDragDropped(new EventHandler<DragEvent>() {
 			public void handle(DragEvent event) {
 				// System.out.println("WAJKSDLAJSLDJALJSLDJ");
