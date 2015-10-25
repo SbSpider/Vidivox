@@ -89,21 +89,6 @@ public class ClipTrack extends BorderPane {
 
 	public void setProgressProperty(DoubleProperty prop, double max) {
 		bar.setVisible(true);
-		// prop.addListener((observable, oldValue, newValue) -> {
-		//
-		// double value = (Double) newValue / max;
-		//
-		// // This little block just adjusts the progress so that it
-		// // appears under the slider object rather than not.
-		// if (value < 0.25) {
-		// value += 0.02;
-		// } else if (value < 0.5) {
-		// value += 0.001;
-		// } else if (value < 0.75) {
-		// value += 0.0001;
-		// }
-		// bar.setProgress(value);
-		// });
 		bar.progressProperty().bind(prop.divide(max));
 	}
 
