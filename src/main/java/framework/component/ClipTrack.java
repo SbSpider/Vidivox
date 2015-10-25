@@ -12,6 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.media.Media;
@@ -20,13 +21,16 @@ public class ClipTrack extends BorderPane {
 
 	ImageView imageView;
 	ProgressBar bar;
+	private HBox hBox;
+	
+	Media media;
 
 	public ClipTrack() {
 
 		imageView = new ImageView();
-//		imageView.setFitHeight(50);
+		// imageView.setFitHeight(50);
 
-//		imageView.setFitWidth(50);
+		// imageView.setFitWidth(50);
 
 		bar = new ProgressBar();
 		bar.setId("clip-progress-bar");
@@ -63,6 +67,7 @@ public class ClipTrack extends BorderPane {
 	 * Generate a ClipTrack from media
 	 * 
 	 * @param media
+	 * @param isPrimary
 	 */
 	public ClipTrack(Media media) {
 
@@ -84,7 +89,10 @@ public class ClipTrack extends BorderPane {
 		generateTask.setOnSucceeded(event -> {
 			// Set the image once generated.
 			imageView.setImage(new Image("file:///" + generateTask.getValue().getAbsolutePath()));
+
 		});
+		
+		this.media = media;
 	}
 
 	public void setProgressProperty(DoubleProperty prop, double max) {

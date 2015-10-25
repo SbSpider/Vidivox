@@ -19,6 +19,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
 
 public class TrackHolder extends BorderPane {
 
@@ -31,6 +32,9 @@ public class TrackHolder extends BorderPane {
 	ListView<ClipTrack> centreList;
 
 	VideoPlayer vidPlayer;
+
+	double maxWidth;
+	double maxTime;
 
 	public TrackHolder() {
 		slider = new Slider();
@@ -84,7 +88,6 @@ public class TrackHolder extends BorderPane {
 					/*
 					 * allow for both copying and moving, whatever user chooses
 					 */
-					System.out.println("ASDA");
 					event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
 				}
 
@@ -99,11 +102,28 @@ public class TrackHolder extends BorderPane {
 				/* if there is a string data on dragboard, read it and use it */
 				Dragboard db = event.getDragboard();
 				boolean success = false;
+
 				if (db.hasFiles()) {
 
 					for (File file : db.getFiles()) {
 						System.out.println("Adding file: " + file.getAbsolutePath());
-						clips.add(new ClipTrack(new Media("file:///" + file.getAbsolutePath())));
+						Media media = new Media("file:///" + file.getAbsolutePath());
+						MediaPlayer player = new MediaPlayer(media);
+						ClipTrack clipTrack = new ClipTrack(media);
+						// clips.add(new ClipTrack(new Media("file:///" +
+						// file.getAbsolutePath()), false));
+
+						player.setOnReady(() -> {
+							System.out.println("Media Duration: " + media.getDuration().toMillis());
+							double trackWidth = (media.getDuration().toMillis() / maxTime) * maxWidth;
+
+							System.out.println("Max Width: " + maxWidth);
+							System.out.println("Max time: " + maxTime);
+							System.out.println("Setting track width: " + trackWidth);
+
+							clipTrack.setMaxWidth(trackWidth);
+						});
+						clips.add(clipTrack);
 
 						clips.forEach(clip -> clip.setProgressProperty(vidPlayer.getProgressSliderProperty(),
 								slider.getMax()));
@@ -139,6 +159,11 @@ public class TrackHolder extends BorderPane {
 		slider.valueProperty().bind(vidPlayer.getProgressSliderProperty());
 
 		clips.forEach(clip -> clip.setProgressProperty(vidPlayer.getProgressSliderProperty(), slider.getMax()));
+
+		// maxWidth = centreList.getItems().get(0).getPrefWidth();
+		maxWidth = centreList.getWidth();
+		maxTime = vidPlayer.getMediaView().getMediaPlayer().getTotalDuration().toMillis();
+
 	}
 
 }
