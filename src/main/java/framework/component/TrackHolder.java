@@ -7,6 +7,7 @@ import java.util.List;
 import application.gui.screens.components.VideoPlayer;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
@@ -16,6 +17,7 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
@@ -29,7 +31,7 @@ public class TrackHolder extends BorderPane {
 	Slider slider;
 
 	List<ClipTrack> clips;
-	ListView<Pane> centreList;
+	ListView<HBox> centreList;
 
 	VideoPlayer vidPlayer;
 
@@ -67,7 +69,7 @@ public class TrackHolder extends BorderPane {
 		bar.progressProperty().bind(slider.valueProperty().divide(slider.getMax()));
 
 		clips = new ArrayList<ClipTrack>();
-		centreList = new ListView<Pane>();
+		centreList = new ListView<HBox>();
 
 		setTop(top);
 		setCenter(centreList);
@@ -93,7 +95,7 @@ public class TrackHolder extends BorderPane {
 				event.consume();
 			}
 		});
-	
+
 		setOnDragDropped(new EventHandler<DragEvent>() {
 			public void handle(DragEvent event) {
 				// System.out.println("WAJKSDLAJSLDJALJSLDJ");
@@ -118,10 +120,7 @@ public class TrackHolder extends BorderPane {
 						centreList.getItems().clear();
 
 						for (ClipTrack clipTrack2 : clips) {
-							Pane box = new Pane(clipTrack2);
-							if (!clipTrack2.getPrimary()) {
-								clipTrack2.setLayoutX(100);
-							}
+							HBox box = getHBoxWithClip(clipTrack2);
 							centreList.getItems().add(box);
 						}
 
@@ -154,7 +153,7 @@ public class TrackHolder extends BorderPane {
 		centreList.getItems().clear();
 		// Add items
 
-		Pane box = new Pane(clips.get(0));
+		HBox box = getHBoxWithClip(clips.get(0));
 		box.setMaxWidth(getMaxWidth());
 		System.out.println("Box max width: " + getMaxWidth());
 		centreList.getItems().addAll(box);
@@ -165,11 +164,30 @@ public class TrackHolder extends BorderPane {
 		clips.forEach(clip -> clip.setProgressProperty(vidPlayer.getProgressSliderProperty(), slider.getMax()));
 
 		// maxWidth = centreList.getItems().get(0).getPrefWidth();
+
 		maxWidth = centreList.getWidth();
+
 		maxTime = vidPlayer.getMediaView().getMediaPlayer().getTotalDuration().toMillis();
+
+		// Remove the scroll buttons for the primary
+		box.getChildren().remove(0);
+		box.getChildren().remove(1);
 
 		clipTrack.setClipMax(maxWidth);
 
+	}
+
+	private HBox getHBoxWithClip(ClipTrack clip) {
+		HBox box = new HBox();
+		Button leftStepButton = new Button("<");
+		Button rightStepButton = new Button(">");
+
+		Pane pane = new Pane();
+		pane.getChildren().add(clip);
+
+		box.getChildren().addAll(leftStepButton, pane, rightStepButton);
+
+		return box;
 	}
 
 }
