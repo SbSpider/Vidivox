@@ -16,10 +16,10 @@ import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 
 public class TrackHolder extends BorderPane {
 
@@ -29,7 +29,7 @@ public class TrackHolder extends BorderPane {
 	Slider slider;
 
 	List<ClipTrack> clips;
-	ListView<ClipTrack> centreList;
+	ListView<Pane> centreList;
 
 	VideoPlayer vidPlayer;
 
@@ -67,7 +67,7 @@ public class TrackHolder extends BorderPane {
 		bar.progressProperty().bind(slider.valueProperty().divide(slider.getMax()));
 
 		clips = new ArrayList<ClipTrack>();
-		centreList = new ListView<ClipTrack>();
+		centreList = new ListView<Pane>();
 
 		setTop(top);
 		setCenter(centreList);
@@ -108,27 +108,26 @@ public class TrackHolder extends BorderPane {
 					for (File file : db.getFiles()) {
 						System.out.println("Adding file: " + file.getAbsolutePath());
 						Media media = new Media("file:///" + file.getAbsolutePath());
-						MediaPlayer player = new MediaPlayer(media);
-						ClipTrack clipTrack = new ClipTrack(media);
+						ClipTrack clipTrack = new ClipTrack(media, false);
 						// clips.add(new ClipTrack(new Media("file:///" +
 						// file.getAbsolutePath()), false));
 
-						player.setOnReady(() -> {
-							System.out.println("Media Duration: " + media.getDuration().toMillis());
-							double trackWidth = (media.getDuration().toMillis() / maxTime) * maxWidth;
-
-							System.out.println("Max Width: " + maxWidth);
-							System.out.println("Max time: " + maxTime);
-							System.out.println("Setting track width: " + trackWidth);
-
-							clipTrack.setMaxWidth(trackWidth);
-						});
 						clips.add(clipTrack);
 
 						clips.forEach(clip -> clip.setProgressProperty(vidPlayer.getProgressSliderProperty(),
 								slider.getMax()));
 						centreList.getItems().clear();
-						centreList.getItems().addAll(clips);
+
+						for (ClipTrack clipTrack2 : clips) {
+							Pane box = new Pane(clipTrack2);
+							if (!clipTrack2.getPrimary()) {
+								clipTrack2.setLayoutX(100);
+							}
+							centreList.getItems().add(box);
+						}
+
+						clipTrack.setClipWidth(maxTime, maxWidth);
+
 					}
 					success = true;
 				}
@@ -149,11 +148,17 @@ public class TrackHolder extends BorderPane {
 
 		Media media = vidPlayer.getMediaView().getMediaPlayer().getMedia();
 		clips.clear();
-		clips.add(new ClipTrack(media));
+
+		ClipTrack clipTrack = new ClipTrack(media, true);
+		clips.add(clipTrack);
 
 		centreList.getItems().clear();
 		// Add items
-		centreList.getItems().addAll(clips);
+
+		Pane box = new Pane(clips.get(0));
+		box.setMaxWidth(getMaxWidth());
+		System.out.println("Box max width: " + getMaxWidth());
+		centreList.getItems().addAll(box);
 
 		// Bind the pogress bar
 		slider.valueProperty().bind(vidPlayer.getProgressSliderProperty());
@@ -163,6 +168,8 @@ public class TrackHolder extends BorderPane {
 		// maxWidth = centreList.getItems().get(0).getPrefWidth();
 		maxWidth = centreList.getWidth();
 		maxTime = vidPlayer.getMediaView().getMediaPlayer().getTotalDuration().toMillis();
+
+		clipTrack.setClipMax(maxWidth);
 
 	}
 

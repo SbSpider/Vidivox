@@ -2,30 +2,42 @@ package framework.component;
 
 import java.io.File;
 
-import framework.media.conversion.FFMPEGConverterTask;
 import framework.media.conversion.FFMPEGGenerateWaveform;
 import javafx.beans.property.DoubleProperty;
+import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.paint.Paint;
 
 public class ClipTrack extends BorderPane {
 
 	ImageView imageView;
 	ProgressBar bar;
 	private HBox hBox;
-	
-	Media media;
+	private MediaPlayer player;
 
-	public ClipTrack() {
+	boolean primary;
+	private Media media;
+	private GridPane center;
+
+	public ClipTrack(boolean primary) {
+		this.primary = primary;
 
 		imageView = new ImageView();
 		// imageView.setFitHeight(50);
@@ -35,11 +47,11 @@ public class ClipTrack extends BorderPane {
 		bar = new ProgressBar();
 		bar.setId("clip-progress-bar");
 
-		GridPane center = new GridPane();
+		center = new GridPane();
 
 		ColumnConstraints col1 = new ColumnConstraints();
-		col1.setMinWidth(10);
-		col1.setPrefWidth(100);
+		col1.setMinWidth(getMaxWidth());
+		col1.setPrefWidth(getPrefWidth());
 		col1.setHgrow(Priority.ALWAYS);
 		col1.setHalignment(HPos.CENTER);
 
@@ -61,6 +73,7 @@ public class ClipTrack extends BorderPane {
 		bar.prefHeightProperty().bind(heightProperty());
 
 		// bar.setVisible(false);
+
 	}
 
 	/**
@@ -69,12 +82,13 @@ public class ClipTrack extends BorderPane {
 	 * @param media
 	 * @param isPrimary
 	 */
-	public ClipTrack(Media media) {
-
-		this();
-
+	public ClipTrack(Media media, boolean primary) {
+		this(primary);
 		setMedia(media);
-
+	}
+	
+	public boolean getPrimary(){
+		return primary;
 	}
 
 	public void setMedia(Media media) {
@@ -86,13 +100,54 @@ public class ClipTrack extends BorderPane {
 		thread.setDaemon(false);
 		thread.start();
 
+		this.media = media;
+
 		generateTask.setOnSucceeded(event -> {
 			// Set the image once generated.
 			imageView.setImage(new Image("file:///" + generateTask.getValue().getAbsolutePath()));
-
 		});
-		
-		this.media = media;
+
+	}
+
+	public void setClipWidth(double maxTime, double maxWidth) {
+
+		player = new MediaPlayer(media);
+
+		player.setOnReady(() -> {
+
+			Media media = player.getMedia();
+
+			System.out.println("Media Duration: " + media.getDuration().toMillis());
+			double trackWidth = (media.getDuration().toMillis() / maxTime) * maxWidth;
+
+			System.out.println("Max Width: " + maxWidth);
+			System.out.println("Max time: " + maxTime);
+			System.out.println("Setting track width: " + trackWidth);
+
+			// ((GridPane) (getCenter())).setMaxWidth(trackWidth);
+			center.setMaxWidth(trackWidth);
+			bar.setMaxWidth(trackWidth);
+
+			center.getColumnConstraints().forEach(constraint -> {
+				constraint.setMaxWidth(trackWidth);
+				constraint.setPrefWidth(trackWidth);
+			});
+		});
+
+		if (!primary) {
+
+
+		}
+	}
+
+	public void setClipMax(double maxTrackWidth) {
+		center.setMaxWidth(maxTrackWidth);
+		bar.setMaxWidth(maxTrackWidth);
+
+		center.getColumnConstraints().forEach(constraint -> {
+			constraint.setMaxWidth(maxTrackWidth);
+			constraint.setPrefWidth(maxTrackWidth);
+		});
 	}
 
 	public void setProgressProperty(DoubleProperty prop, double max) {
@@ -110,6 +165,20 @@ public class ClipTrack extends BorderPane {
 	protected void setWidth(double value) {
 		super.setWidth(value);
 		imageView.setFitWidth(value);
+	}
+
+	// Utilized
+	// http://stackoverflow.com/questions/30316917/javafx-draggable-node-label-horizontally-only-not-vertically
+
+	class DragContext {
+		double x;
+		double y;
+	}
+	
+	DragContext dragContext = new DragContext();
+	
+	public DragContext getDragContext(){
+		return dragContext;
 	}
 
 }
