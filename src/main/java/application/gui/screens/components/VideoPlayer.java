@@ -133,6 +133,8 @@ public class VideoPlayer extends BorderPane {
 
 	ProgressBar conversionProgressBar;
 
+	Slider volumeSlider;
+
 	/*
 	 * =====================================================================
 	 * Below are objects that aren't GUI objects.
@@ -274,27 +276,9 @@ public class VideoPlayer extends BorderPane {
 
 		bottomGridPane.add(conversionProgressBar, 0, 2);
 
-		/*
-		 * <ButtonBar prefHeight="40.0" prefWidth="200.0"> <buttons> <Button
-		 * mnemonicParsing="false" text="&lt;&lt;" /> <Button
-		 * mnemonicParsing="false" text="&lt;|" /> <Button
-		 * mnemonicParsing="false" text="&gt;" /> <Button
-		 * mnemonicParsing="false" text="|&gt;" /> <Button
-		 * mnemonicParsing="false" text="&gt;&gt;" /> </buttons> </ButtonBar>
-		 */
-
 		// this.getStylesheets().add("/css/VideoPlayer_Base.css");
 		this.setStyle("-fx-background-color : white");
 		this.setMaxSize(600, 600);
-
-		// http://stackoverflow.com/questions/14157161/hybrid-of-slider-with-progress-bar-javafx
-		// used for progress bar / slider hybrid
-
-		// Bind the value property of the slider to the progress property, so
-		// both are updated.
-
-		// Start the media.
-		// startMedia();
 
 		// Register the button event handlers.
 		playPauseButton.setOnAction(event -> {
@@ -361,6 +345,18 @@ public class VideoPlayer extends BorderPane {
 			startTimeline();
 		});
 
+		volumeSlider = new Slider();
+		volumeSlider.setMaxWidth(300);
+		volumeSlider.setMin(0);
+		volumeSlider.setMax(1);
+		volumeSlider.setValue(1);
+		Label volumeLabel = new Label("Volume:");
+		HBox volumeBox = new HBox();
+		volumeBox.setAlignment(Pos.CENTER);
+		volumeBox.setPadding(new Insets(0, 10, 0, 0));
+		volumeBox.getChildren().addAll(volumeLabel, volumeSlider);
+		bottomGridPane.add(volumeBox, 1, 2);
+
 		mergeAudioButton.setOnAction(event -> {
 			// Pause the video so that the location is preserved.
 			pauseVideo();
@@ -391,8 +387,6 @@ public class VideoPlayer extends BorderPane {
 				String outputName = saveFile.getAbsolutePath();
 				mergeWithAudioAtLocation(mp3File.getAbsolutePath(), outputName);
 
-				// startMedia(new Media("file:///" +
-				// saveFile.getAbsolutePath()));
 			} else {
 				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
@@ -463,8 +457,6 @@ public class VideoPlayer extends BorderPane {
 				String outputName = saveFile.getAbsolutePath();
 				mergeWithAudioAtLocation(ttsFilename, outputName);
 
-				// startMedia(new Media("file:///" +
-				// sanitiseFileName(saveFile.getAbsolutePath())));
 			} else {
 				if (playPauseButton.getText().equals(">")) {
 					playPauseButton.fire();
@@ -627,13 +619,6 @@ public class VideoPlayer extends BorderPane {
 		System.out.println("Showing");
 		System.out.println();
 		System.out.println();
-		//
-		// try {
-		// thread.join();
-		// } catch (InterruptedException e) {
-		// System.out.println("Interupted");
-		// e.printStackTrace();
-		// }
 
 		sideChainMergeTask.setOnSucceeded(event -> {
 			System.out.println("Succeeded");
@@ -749,7 +734,6 @@ public class VideoPlayer extends BorderPane {
 		mediaPlayer.setOnReady(new Runnable() {
 			public void run() {
 				mediaOnReady(mediaPlayer);
-
 			}
 		});
 
@@ -758,6 +742,27 @@ public class VideoPlayer extends BorderPane {
 			// the button set to pause).
 			pauseVideo();
 		});
+
+	}
+
+	protected void updateValues() {
+		if (currentTimeLabel != null && progressSlider != null) {
+			Platform.runLater(() -> {
+				MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+				Duration currentTime = mediaPlayer.getCurrentTime();
+				currentTimeLabel.setText(formatTime(currentTime, duration));
+
+				if (!progressSlider.isDisabled() && duration.greaterThan(Duration.ZERO)
+						&& !progressSlider.isValueChanging()) {
+					progressSlider.setValue(currentTime.divide(duration).toMillis() * 100.0);
+				}
+
+			});
+		}
+	}
+
+	private void mediaOnReady(MediaPlayer mediaPlayer) {
+		duration = mediaPlayer.getMedia().getDuration();
 
 		// Value changing property for the sliding action.
 		progressSlider.valueProperty().addListener(new InvalidationListener() {
@@ -790,28 +795,16 @@ public class VideoPlayer extends BorderPane {
 			}
 		});
 
-		titleText.setText("Playing : " + FilenameUtils.getBaseName(media.getSource()));
-
-	}
-
-	protected void updateValues() {
-		if (currentTimeLabel != null && progressSlider != null) {
-			Platform.runLater(() -> {
-				MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
-				Duration currentTime = mediaPlayer.getCurrentTime();
-				currentTimeLabel.setText(formatTime(currentTime, duration));
-
-				if (!progressSlider.isDisabled() && duration.greaterThan(Duration.ZERO)
-						&& !progressSlider.isValueChanging()) {
-					progressSlider.setValue(currentTime.divide(duration).toMillis() * 100.0);
+		volumeSlider.valueProperty().addListener(new InvalidationListener() {
+			public void invalidated(Observable ov) {
+				if (volumeSlider.isValueChanging()) {
+					mediaPlayer.setVolume(volumeSlider.getValue());
 				}
+			}
+		});
 
-			});
-		}
-	}
+		titleText.setText("Playing : " + FilenameUtils.getBaseName(mediaPlayer.getMedia().getSource()));
 
-	private void mediaOnReady(MediaPlayer mp) {
-		duration = mp.getMedia().getDuration();
 		updateValues();
 	}
 

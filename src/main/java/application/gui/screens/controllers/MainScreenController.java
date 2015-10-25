@@ -10,7 +10,6 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 import application.gui.Window;
 import application.gui.screens.components.VideoPlayer;
@@ -119,7 +118,7 @@ public class MainScreenController implements Initializable {
 		editingOptions.setMaxHeight(dirTreeView.getMaxHeight());
 		editingOptions.setPrefWidth(dirTreeView.getPrefWidth());
 		editingOptions.setPrefHeight(dirTreeView.getPrefHeight());
-		
+
 		videoPlayer.getAudioVolumeProperty().bind(editingOptions.getAudioProperty());
 		videoPlayer.getVideoVolumeProperty().bind(editingOptions.getVideoProperty());
 		videoPlayer.getMasterVolumeProperty().bind(editingOptions.getMasterProperty());
@@ -226,12 +225,6 @@ public class MainScreenController implements Initializable {
 		chooser.setExtensionFilters(new ExtensionFilter("Vidivox Project", "*.vvoxproj"));
 
 		File saveFile = chooser.showOpenDialog(Window.getPrimaryStage());
-
-		// String jsonSaveData = String.join("\n",
-		// Files.readAllLines(Paths.get(saveFile.toURI())));
-
-		// System.out.println(jsonSaveData);
-		// SaveFileDO saveFileDO = JSONConverter.convertToDO(jsonSaveData);
 
 		FileInputStream fs = new FileInputStream(saveFile);
 		ObjectInputStream ois = new ObjectInputStream(fs);
