@@ -26,6 +26,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.HPos;
@@ -134,6 +135,8 @@ public class VideoPlayer extends BorderPane {
 	ProgressBar conversionProgressBar;
 
 	Slider volumeSlider;
+
+	Button muteButton;
 
 	/*
 	 * =====================================================================
@@ -351,11 +354,28 @@ public class VideoPlayer extends BorderPane {
 		volumeSlider.setMax(1);
 		volumeSlider.setValue(1);
 		Label volumeLabel = new Label("Volume:");
+		muteButton = new Button("Mute");
 		HBox volumeBox = new HBox();
 		volumeBox.setAlignment(Pos.CENTER);
-		volumeBox.setPadding(new Insets(0, 10, 0, 0));
-		volumeBox.getChildren().addAll(volumeLabel, volumeSlider);
+		volumeBox.getChildren().addAll(volumeLabel, volumeSlider, muteButton);
 		bottomGridPane.add(volumeBox, 1, 2);
+
+		muteButton.setOnAction(event -> {
+
+			if (mediaView.getMediaPlayer() != null) {
+				MediaPlayer mediaPlayer = mediaView.getMediaPlayer();
+				if (muteButton.getText().equals("Mute")) {
+					mediaPlayer.setMute(true);
+					muteButton.setText("Unmute");
+				} else {
+					// By else rather than else if, we can handle case if the
+					// mute button is set
+					// to something other than expected
+					mediaPlayer.setMute(false);
+					muteButton.setText("Mute");
+				}
+			}
+		});
 
 		mergeAudioButton.setOnAction(event -> {
 			// Pause the video so that the location is preserved.
