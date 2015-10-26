@@ -8,6 +8,7 @@ import application.gui.screens.components.VideoPlayer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
@@ -43,6 +44,9 @@ public class TrackHolder extends BorderPane {
 	double maxTime;
 
 	public TrackHolder() {
+
+		setId("TrackHolder");
+		
 		slider = new Slider();
 		bar = new ProgressBar();
 
@@ -62,11 +66,25 @@ public class TrackHolder extends BorderPane {
 		row1.setPrefHeight(30);
 		row1.setVgrow(Priority.SOMETIMES);
 
+		RowConstraints row2 = new RowConstraints();
+		// row1.setMinHeight(10);
+		row2.setPrefHeight(30);
+		row2.setVgrow(Priority.SOMETIMES);
+
 		top.getColumnConstraints().addAll(col1);
-		top.getRowConstraints().addAll(row1);
+		top.getRowConstraints().addAll(row1, row2);
 
 		top.add(slider, 0, 0);
 		top.add(bar, 0, 0);
+
+		HBox buttonBox = new HBox();
+		Button mergeAllButton = new Button("Merge all");
+		Button cancelButton = new Button("Cancell");
+		buttonBox.setAlignment(Pos.CENTER);
+
+		buttonBox.getChildren().addAll(mergeAllButton, cancelButton);
+
+		top.add(buttonBox, 0, 1);
 
 		slider.valueProperty().set(0);
 
