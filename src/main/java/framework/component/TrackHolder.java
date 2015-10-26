@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import application.gui.screens.components.VideoPlayer;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
@@ -179,8 +180,19 @@ public class TrackHolder extends BorderPane {
 
 	private HBox getHBoxWithClip(ClipTrack clip) {
 		HBox box = new HBox();
+
 		Button leftStepButton = new Button("<");
 		Button rightStepButton = new Button(">");
+		EventHandler<ActionEvent> mouseEventHandler = event ->{
+			System.out.println("Clicked button");
+		};
+		
+		clip.setOnMouseClicked(event -> {
+			System.out.println("Clicked track");
+		});
+		
+		leftStepButton.setOnAction(mouseEventHandler);
+		rightStepButton.setOnAction(mouseEventHandler);
 
 		Pane pane = new Pane();
 		pane.getChildren().add(clip);
