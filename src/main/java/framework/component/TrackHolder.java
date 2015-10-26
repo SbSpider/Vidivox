@@ -181,6 +181,10 @@ public class TrackHolder extends BorderPane {
 	private HBox getHBoxWithClip(ClipTrack clip) {
 		HBox box = new HBox();
 
+		// Note that the code below has been kept as redunancy. For some reason,
+		// the VideoPlayer
+		// time properties seem to fail without it (DO NOT TOUCH).
+
 		Button leftStepButton = new Button("<");
 		Button rightStepButton = new Button(">");
 		EventHandler<ActionEvent> mouseEventHandler = event -> {
@@ -193,11 +197,14 @@ public class TrackHolder extends BorderPane {
 
 		leftStepButton.setOnAction(mouseEventHandler);
 		rightStepButton.setOnAction(mouseEventHandler);
+		
+		leftStepButton.setVisible(false);
+		rightStepButton.setVisible(false);
 
 		Pane pane = new Pane();
 		pane.getChildren().add(clip);
 
-		box.getChildren().addAll(leftStepButton, pane, rightStepButton);
+		box.getChildren().addAll(leftStepButton, clip , rightStepButton);
 
 		return box;
 	}

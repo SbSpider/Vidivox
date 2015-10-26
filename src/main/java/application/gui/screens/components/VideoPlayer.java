@@ -223,7 +223,7 @@ public class VideoPlayer extends BorderPane {
 		progressSlider.setId("player-slider");
 		progressSlider.setMaxWidth(Double.MAX_VALUE);
 
-		progressSlider.valueProperty().set(0);
+		progressSlider.setValue(0);
 		progressSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
 
 			double value = (Double) newValue / progressSlider.getMax();
@@ -231,7 +231,7 @@ public class VideoPlayer extends BorderPane {
 			// This little block just adjusts the progress so that it
 			// appears under the slider object rather than not.
 			if (value < 0.25) {
-				value += 0.02;
+				value += 0.025;
 			} else if (value < 0.5) {
 				value += 0.001;
 			} else if (value < 0.75) {
@@ -743,14 +743,6 @@ public class VideoPlayer extends BorderPane {
 
 		mediaView.setMediaPlayer(mediaPlayer);
 
-		// https://docs.oracle.com/javase/8/javafx/media-tutorial/playercontrol.htm
-		// was used.
-		mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
-			public void invalidated(Observable ov) {
-				updateValues();
-			}
-		});
-
 		mediaPlayer.setOnReady(new Runnable() {
 			public void run() {
 				mediaOnReady(mediaPlayer);
@@ -782,7 +774,6 @@ public class VideoPlayer extends BorderPane {
 	}
 
 	private void mediaOnReady(MediaPlayer mediaPlayer) {
-		duration = mediaPlayer.getMedia().getDuration();
 
 		// Value changing property for the sliding action.
 		progressSlider.valueProperty().addListener(new InvalidationListener() {
@@ -822,6 +813,16 @@ public class VideoPlayer extends BorderPane {
 				}
 			}
 		});
+
+		// https://docs.oracle.com/javase/8/javafx/media-tutorial/playercontrol.htm
+		// was used.
+		mediaPlayer.currentTimeProperty().addListener(new InvalidationListener() {
+			public void invalidated(Observable ov) {
+				updateValues();
+			}
+		});
+
+		duration = mediaPlayer.getTotalDuration();
 
 		titleText.setText("Playing : " + FilenameUtils.getBaseName(mediaPlayer.getMedia().getSource()));
 
