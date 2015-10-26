@@ -8,11 +8,13 @@ import application.gui.screens.components.VideoPlayer;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.input.TransferMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -23,6 +25,7 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
+import javafx.util.Duration;
 
 public class TrackHolder extends BorderPane {
 
@@ -118,18 +121,16 @@ public class TrackHolder extends BorderPane {
 
 						clipTrack.setProgressProperty(vidPlayer.getProgressSliderProperty(), slider.getMax());
 
-//						centreList.getChildren().clear();
+						HBox box = getHBoxWithClip(clipTrack);
 
-//						for (ClipTrack clipTrack2 : clips) {
-							HBox box = getHBoxWithClip(clipTrack);
-//
-//							if (!clipTrack2.getPrimary()) {
-								clipTrack.setLayoutX(1000);
-//							}
-							centreList.getChildren().add(box);
-//						}
-						
-//						centreList.getChildren().add(e)
+						Duration currentTime = vidPlayer.getMediaView().getMediaPlayer().getCurrentTime();
+						double insertionLocation = (currentTime.toMillis() / maxTime) * maxWidth;
+
+						clipTrack.setLayoutX(insertionLocation);
+
+						System.out.println("Setting X location: " + insertionLocation);
+
+						centreList.getChildren().add(box);
 
 						clipTrack.setClipWidth(maxTime, maxWidth);
 
@@ -184,12 +185,21 @@ public class TrackHolder extends BorderPane {
 
 	}
 
+	/**
+	 * Gets an HBox that will contain the component.
+	 * 
+	 * @param clip
+	 * @return
+	 */
 	private HBox getHBoxWithClip(ClipTrack clip) {
 		HBox box = new HBox();
 
 		// Note that the code below has been kept as redunancy. For some reason,
-		// the VideoPlayer
-		// time properties seem to fail without it (DO NOT TOUCH).
+		// the VideoPlayer time properties seem to fail without it (DO NOT
+		// TOUCH). A possible reason may be due to thread contention which
+		// occurs when the event handlers in videoplayer are called, and where
+		// having this code provides enough time for the event handler to have
+		// all the values it needs.
 
 		Button leftStepButton = new Button("<");
 		Button rightStepButton = new Button(">");
@@ -206,13 +216,57 @@ public class TrackHolder extends BorderPane {
 
 		leftStepButton.setVisible(false);
 		rightStepButton.setVisible(false);
+		leftStepButton.setMaxWidth(0);
+		rightStepButton.setMaxWidth(0);
 
-		Pane pane = new Pane();
-		pane.getChildren().add(clip);
+		Pane pane = new Pane(clip);
 
-		box.getChildren().addAll(leftStepButton, clip, rightStepButton);
+		box.getChildren().addAll(leftStepButton, pane, rightStepButton);
+
+		// USed to make nodes dragable horizontally.
+		// http://stackoverflow.com/questions/30316917/javafx-draggable-node-label-horizontally-only-not-vertically
+		// MouseGestures gestures = new MouseGestures();
+		// gestures.makeDraggable(pane);
 
 		return box;
 	}
-	
+
+	public static class MouseGestures {
+
+		class DragContext {
+			double x;
+			double y;
+		}
+
+		DragContext dragContext = new DragContext();
+
+		public void makeDraggable(Node node) {
+			node.setOnMousePressed(onMousePressedEventHandler);
+			node.setOnMouseDragged(onMouseDraggedEventHandler);
+		}
+
+		EventHandler<MouseEvent> onMousePressedEventHandler = event -> {
+
+			Node node = ((Node) (event.getSource()));
+
+			dragContext.x = node.getTranslateX() - event.getSceneX();
+			dragContext.y = node.getTranslateY() - event.getSceneY();
+
+			System.out.println("MousenPressed");
+		};
+
+		EventHandler<MouseEvent> onMouseDraggedEventHandler = event -> {
+
+			Node node = ((Node) (event.getSource()));
+
+			node.setTranslateX(dragContext.x + event.getSceneX());
+
+			System.out.println("MouseDragged");
+
+			// node.setTranslateY( dragContext.y + event.getSceneY()); //
+			// uncomment this if you want x/y dragging
+
+		};
+	}
+
 }

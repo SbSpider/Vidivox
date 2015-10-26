@@ -130,9 +130,6 @@ public class ClipTrack extends BorderPane {
 				});
 			});
 
-			setOnMouseClicked(event -> {
-				System.out.println("I GOT CLICKS!!!");
-			});
 		}
 	}
 
