@@ -103,33 +103,37 @@ public class ClipTrack extends BorderPane {
 
 	public void setClipWidth(double maxTime, double maxWidth) {
 
-		player = new MediaPlayer(media);
+		if (primary) {
+			setClipMax(maxWidth);
+		} else {
 
-		player.setOnReady(() -> {
+			player = new MediaPlayer(media);
 
-			Media media = player.getMedia();
+			player.setOnReady(() -> {
 
-			System.out.println("Media Duration: " + media.getDuration().toMillis());
-			double trackWidth = (media.getDuration().toMillis() / maxTime) * maxWidth;
+				Media media = player.getMedia();
 
-			System.out.println("Max Width: " + maxWidth);
-			System.out.println("Max time: " + maxTime);
-			System.out.println("Setting track width: " + trackWidth);
+				System.out.println("Media Duration: " + media.getDuration().toMillis());
+				double trackWidth = (media.getDuration().toMillis() / maxTime) * maxWidth;
 
-			// ((GridPane) (getCenter())).setMaxWidth(trackWidth);
-			center.setMaxWidth(trackWidth);
-			bar.setMaxWidth(trackWidth);
+				System.out.println("Max Width: " + maxWidth);
+				System.out.println("Max time: " + maxTime);
+				System.out.println("Setting track width: " + trackWidth);
 
-			center.getColumnConstraints().forEach(constraint -> {
-				constraint.setMaxWidth(trackWidth);
-				constraint.setPrefWidth(trackWidth);
+				// ((GridPane) (getCenter())).setMaxWidth(trackWidth);
+				center.setMaxWidth(trackWidth);
+				bar.setMaxWidth(trackWidth);
+
+				center.getColumnConstraints().forEach(constraint -> {
+					constraint.setMaxWidth(trackWidth);
+					constraint.setPrefWidth(trackWidth);
+				});
 			});
-		});
 
-		setOnMouseClicked(event -> {
-			System.out.println("I GOT CLICKS!!!");
-		});
-
+			setOnMouseClicked(event -> {
+				System.out.println("I GOT CLICKS!!!");
+			});
+		}
 	}
 
 	public void setClipMax(double maxTrackWidth) {

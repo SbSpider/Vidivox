@@ -116,14 +116,20 @@ public class TrackHolder extends BorderPane {
 
 						clips.add(clipTrack);
 
-						clips.forEach(clip -> clip.setProgressProperty(vidPlayer.getProgressSliderProperty(),
-								slider.getMax()));
-						centreList.getChildren().clear();
+						clipTrack.setProgressProperty(vidPlayer.getProgressSliderProperty(), slider.getMax());
 
-						for (ClipTrack clipTrack2 : clips) {
-							HBox box = getHBoxWithClip(clipTrack2);
+//						centreList.getChildren().clear();
+
+//						for (ClipTrack clipTrack2 : clips) {
+							HBox box = getHBoxWithClip(clipTrack);
+//
+//							if (!clipTrack2.getPrimary()) {
+								clipTrack.setLayoutX(1000);
+//							}
 							centreList.getChildren().add(box);
-						}
+//						}
+						
+//						centreList.getChildren().add(e)
 
 						clipTrack.setClipWidth(maxTime, maxWidth);
 
@@ -197,16 +203,16 @@ public class TrackHolder extends BorderPane {
 
 		leftStepButton.setOnAction(mouseEventHandler);
 		rightStepButton.setOnAction(mouseEventHandler);
-		
+
 		leftStepButton.setVisible(false);
 		rightStepButton.setVisible(false);
 
 		Pane pane = new Pane();
 		pane.getChildren().add(clip);
 
-		box.getChildren().addAll(leftStepButton, clip , rightStepButton);
+		box.getChildren().addAll(leftStepButton, clip, rightStepButton);
 
 		return box;
 	}
-
+	
 }
