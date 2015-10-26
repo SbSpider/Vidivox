@@ -164,6 +164,18 @@ public class TrackHolder extends BorderPane {
 				event.consume();
 			}
 		});
+		
+		
+		mergeAllButton.setOnAction(event -> {
+			
+		});
+		
+		cancelButton.setOnAction(event -> {
+			Node node = centreList.getChildren().get(0);
+			
+			centreList.getChildren().clear();
+			centreList.getChildren().add(node);
+		});
 	}
 
 	public void setVideoSource(VideoPlayer vidPlayer) {
