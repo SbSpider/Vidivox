@@ -9,7 +9,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.control.Slider;
 import javafx.scene.input.DragEvent;
@@ -22,6 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 
 public class TrackHolder extends BorderPane {
@@ -32,7 +32,7 @@ public class TrackHolder extends BorderPane {
 	Slider slider;
 
 	List<ClipTrack> clips;
-	ListView<HBox> centreList;
+	VBox centreList;
 
 	VideoPlayer vidPlayer;
 
@@ -70,7 +70,7 @@ public class TrackHolder extends BorderPane {
 		bar.progressProperty().bind(slider.valueProperty().divide(slider.getMax()));
 
 		clips = new ArrayList<ClipTrack>();
-		centreList = new ListView<HBox>();
+		centreList = new VBox();
 
 		setTop(top);
 		setCenter(centreList);
@@ -118,11 +118,11 @@ public class TrackHolder extends BorderPane {
 
 						clips.forEach(clip -> clip.setProgressProperty(vidPlayer.getProgressSliderProperty(),
 								slider.getMax()));
-						centreList.getItems().clear();
+						centreList.getChildren().clear();
 
 						for (ClipTrack clipTrack2 : clips) {
 							HBox box = getHBoxWithClip(clipTrack2);
-							centreList.getItems().add(box);
+							centreList.getChildren().add(box);
 						}
 
 						clipTrack.setClipWidth(maxTime, maxWidth);
@@ -151,13 +151,13 @@ public class TrackHolder extends BorderPane {
 		ClipTrack clipTrack = new ClipTrack(media, true);
 		clips.add(clipTrack);
 
-		centreList.getItems().clear();
+		centreList.getChildren().clear();
 		// Add items
 
 		HBox box = getHBoxWithClip(clips.get(0));
 		box.setMaxWidth(getMaxWidth());
 		System.out.println("Box max width: " + getMaxWidth());
-		centreList.getItems().addAll(box);
+		centreList.getChildren().addAll(box);
 
 		// Bind the pogress bar
 		slider.valueProperty().bind(vidPlayer.getProgressSliderProperty());
@@ -183,14 +183,14 @@ public class TrackHolder extends BorderPane {
 
 		Button leftStepButton = new Button("<");
 		Button rightStepButton = new Button(">");
-		EventHandler<ActionEvent> mouseEventHandler = event ->{
+		EventHandler<ActionEvent> mouseEventHandler = event -> {
 			System.out.println("Clicked button");
 		};
-		
+
 		clip.setOnMouseClicked(event -> {
 			System.out.println("Clicked track");
 		});
-		
+
 		leftStepButton.setOnAction(mouseEventHandler);
 		rightStepButton.setOnAction(mouseEventHandler);
 

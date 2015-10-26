@@ -126,6 +126,7 @@ public class MainScreenController implements Initializable {
 		// Hide the track holder until there is a video present
 		trackHolder.setVisible(false);
 
+		// Set so that it is of similar size the DirTreeView for aethetic purposes.
 		editingOptions.setMaxWidth(dirTreeView.getMaxWidth());
 		editingOptions.setMaxHeight(dirTreeView.getMaxHeight());
 		editingOptions.setPrefWidth(dirTreeView.getPrefWidth());
