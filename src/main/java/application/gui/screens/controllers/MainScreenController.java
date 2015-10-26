@@ -18,6 +18,7 @@ import framework.component.EditingOptions;
 import framework.component.PrefFileChooser;
 import framework.component.TrackHolder;
 import framework.component.TreeViewDirectoryViewer;
+import framework.media.conversion.FFMPEGConverterTask;
 import framework.savefunction.SaveFileDO;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -72,6 +73,17 @@ public class MainScreenController implements Initializable {
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		
+		// Run core prep work first
+		try {
+			FFMPEGConverterTask.prepare();
+		} catch (IOException e) {
+			System.out.println("Unable to prepare core tools, exiting application.");
+			e.printStackTrace();
+			return;
+		}
+		
+		
 
 		// Setup default scratch dir
 		File dir = new File(System.getProperty("user.home") + "/.Vidivox/scratch");

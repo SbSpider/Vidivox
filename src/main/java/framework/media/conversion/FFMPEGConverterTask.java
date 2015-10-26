@@ -1,6 +1,7 @@
 package framework.media.conversion;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.regex.Matcher;
@@ -12,7 +13,24 @@ import javafx.util.Duration;
 public class FFMPEGConverterTask extends Task<Void> {
 
 	private static final String COMMON_SET = " -strict -2 -preset ultrafast -ac 2 ";
-	
+
+	public static boolean fallbackAmix = false;
+
+	/**
+	 * Does prep checks, should be run towards beginning of application.
+	 * 
+	 * @throws IOException
+	 */
+	public static void prepare() throws IOException {
+		// Will check for filter.
+		if (!CheckForFFMpegFilterSupport.check("sidechaincompress")) {
+			fallbackAmix = true;
+
+			System.out.println("Falling back to amix in place of sidechaincompress");
+		}
+
+	}
+
 	/**
 	 * Command to perform via ffmpeg
 	 */
@@ -57,9 +75,16 @@ public class FFMPEGConverterTask extends Task<Void> {
 	 */
 	public FFMPEGConverterTask(String inputAudioFilePath, String inputVideoFilePath, String outputFilePath) {
 		this();
-		command += "-i " + inputVideoFilePath + " -i " + inputAudioFilePath
-				+ " -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" "
-				+ " -acodec aac " + COMMON_SET + outputFilePath;
+
+		command += "-i " + inputVideoFilePath + " -i " + inputAudioFilePath;
+
+		if (fallbackAmix) {
+			command += " -filter_complex \"amix=duration=first:dropout_transition=1\" ";
+		} else {
+			command += " -filter_complex \"[1:a]asplit=2[sc][mix];[0:a][sc]sidechaincompress[compr];[compr][mix]amerge\" ";
+		}
+
+		command += " -acodec aac " + COMMON_SET + outputFilePath;
 	}
 
 	/**
